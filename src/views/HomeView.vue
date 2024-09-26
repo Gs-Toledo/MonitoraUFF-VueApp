@@ -1,25 +1,30 @@
 <template>
-  <main>
-    teste
-  </main>
+  <main>teste</main>
 </template>
 
 <script>
 import axios from 'axios'
+
 export default {
   methods: {
     async zoneMinderRequest() {
-      let ip = '192.168.1.107'
-      let port = '88'
-       let url = `http://${ip}:${port}/zm/api/host/login.json?user=admin&pass=admin`
-      //let url = '/zm/api/host/login.json?user=admin&pass=admin'
-
+      /*  let ip = '192.168.1.107'; */
+      /* let port = '88' */
+      /*       let url = `http://localhost:${port}/api/host/login.json`;
+       */
+      let url = '/api/host/login.json'
       try {
-        let response = await axios.post(url)
-  
-        console.log(response)
+        let response = await axios.post(
+          url,
+          new URLSearchParams({
+            user: 'admin',
+            pass: 'admin'
+          })
+        )
+
+        console.log(response.data)
       } catch (error) {
-        console.error('erro na api do zoneminder', error)
+        console.error('Erro na API do ZoneMinder', error)
         console.log(url)
       }
     }

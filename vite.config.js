@@ -14,5 +14,13 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:88',  // O backend do ZoneMinder está rodando aqui
+        changeOrigin: true,             // Permite mudar a origem
+      }
+    }
   }
 })
