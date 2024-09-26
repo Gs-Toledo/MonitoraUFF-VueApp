@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:88',  // O backend do ZoneMinder está rodando aqui
+        target: 'http://192.168.1.107:88',  // O backend do ZoneMinder está rodando aqui
         changeOrigin: true,             // Permite mudar a origem
       }
     }
