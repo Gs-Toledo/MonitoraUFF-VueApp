@@ -1,32 +1,29 @@
 <template>
   <main>
     <div>
-
       <div>
         <label for="usernameInput">Username</label>
-        <input type="text" id="usernameInput" v-model="username">
+        <input type="text" id="usernameInput" v-model="username" />
       </div>
 
       <div>
         <label for="passwordInput">Password</label>
-        <input type="text" id="passwordInput" v-model="password">
+        <input type="text" id="passwordInput" v-model="password" />
       </div>
 
       <button type="button" id="button-login" @click="zoneMinderRequest">Enviar</button>
-      <div v-if="acessToken">
-        Token de acesso: {{ acessToken }}
-      </div>
+      <div v-if="acessToken">Token de acesso: {{ acessToken }}</div>
     </div>
-
   </main>
 </template>
+
 <script>
 import axios from 'axios'
 
 export default {
   data() {
     return {
-      username:'',
+      username: '',
       password: '',
       acessToken: ''
     }
@@ -54,6 +51,6 @@ export default {
         console.log(url)
       }
     }
-  },
+  }
 }
 </script>
