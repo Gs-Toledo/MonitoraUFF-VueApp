@@ -10,11 +10,7 @@ class AuthService {
             params.append('user', loginData.user);
             params.append('pass', loginData.pass);
 
-            const response = await axios.post('/api/host/login.json', params, {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
+            const response = await axios.post('/api/host/login.json', params);
             return response.data;
         } catch (error) {
             console.error('Erro ao realizar o login:', error);

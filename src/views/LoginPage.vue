@@ -33,7 +33,6 @@ export default {
     async executeLogin() {
       try {
         const loginData = { user: this.username, pass: this.password }
-        console.log(loginData)
         await this.login(loginData)
         this.$router.push('/home')
       } catch (error) {
