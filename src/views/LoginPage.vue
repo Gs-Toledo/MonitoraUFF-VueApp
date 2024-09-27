@@ -8,47 +8,36 @@
 
       <div>
         <label for="passwordInput">Password</label>
-        <input type="text" id="passwordInput" v-model="password" />
+        <input type="password" id="passwordInput" v-model="password" />
       </div>
 
-      <button type="button" id="button-login" @click="zoneMinderRequest">Enviar</button>
-      <div v-if="acessToken">Token de acesso: {{ acessToken }}</div>
+      <button type="button" id="button-login" @click="executeLogin">Enviar</button>
+      <div v-if="errorMessage">{{ errorMessage }}</div>
     </div>
   </main>
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
 
 export default {
   data() {
     return {
       username: '',
       password: '',
-      acessToken: ''
+      errorMessage: ''
     }
   },
   methods: {
-    async zoneMinderRequest() {
-      /*  let ip = '192.168.1.107'; */
-      /* let port = '88' */
-      /*       let url = `http://localhost:${port}/api/host/login.json`;
-       */
-      let url = '/api/host/login.json'
+    ...mapActions(['login']),
+    async executeLogin() {
       try {
-        let response = await axios.post(
-          url,
-          new URLSearchParams({
-            user: this.username,
-            pass: this.password
-          })
-        )
-
-        console.log(response.data)
-        this.acessToken = response.data.access_token
+        const loginData = { user: this.username, pass: this.password }
+        console.log(loginData)
+        await this.login(loginData)
+        this.$router.push('/home')
       } catch (error) {
-        console.error('Erro na API do ZoneMinder', error)
-        console.log(url)
+        this.errorMessage = 'Login falhou. Verifique suas credenciais.'
       }
     }
   }
