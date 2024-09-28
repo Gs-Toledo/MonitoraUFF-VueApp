@@ -1,11 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '@/views/LoginPage.vue'
 import HomePage from '@/views/HomePage.vue'
-import store from '@/store/index'; 
+import store from '@/store/index';
 
 const routes = [
   {
     path: '/',
+    name: 'Root',
+    beforeEnter: (to, from, next) => {
+      if (store.getters.isAuthenticated) {
+        next('/home');
+      } else {
+        next('/login');
+      }
+    }
+  },
+  {
+    path: '/login',
     name: 'Login',
     component: LoginPage
   },
@@ -25,7 +36,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters.isAuthenticated;
   if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/'); 
+    next('/');
   } else {
     next();
   }
