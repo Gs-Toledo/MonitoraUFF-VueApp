@@ -5,8 +5,8 @@ export default class ZoneminderService {
     async getMonitors() {
         try {
             const response = await axiosZoneminder.get('/monitors.json');
-            console.log('monitors', response.data);
-            return response.data;
+            console.log('monitors', response.data.monitors);
+            return response.data.monitors;
         } catch (error) {
             console.error('Erro ao buscar monitores:', error);
             throw error;
