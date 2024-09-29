@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '@/views/LoginPage.vue'
 import HomePage from '@/views/HomePage.vue'
 import store from '@/store/index';
+import MonitorPage from '@/views/MonitorPage.vue';
 
 const routes = [
   {
@@ -25,6 +26,13 @@ const routes = [
     name: 'Home',
     component: HomePage,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/monitor/:id',
+    props: true,
+    name: 'Monitor',
+    component: MonitorPage,
+    meta: {requiresAuth: true}
   }
 ];
 

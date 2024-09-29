@@ -3,7 +3,11 @@
   <div v-else-if="error">{{ error }}</div>
   <div v-else-if="!loading && !error" id="monitors-div">
     <div v-for="(monitor, index) in monitors" :key="index">
-      <h4>{{ monitor.Monitor.Name }}</h4>
+      <h4>
+        <router-link :to="'/monitor/' + monitor.Monitor_Status.MonitorId">
+          {{ monitor.Monitor.Name }}</router-link
+        >
+      </h4>
       <img
         width="500"
         height="600"
@@ -29,7 +33,7 @@ export default {
     ...mapGetters(['getToken'])
   },
   methods: {
-    async getObsMonitor() {
+    async getAllMonitors() {
       try {
         const zoneminderService = new ZoneminderService()
         this.monitors = await zoneminderService.getMonitors()
@@ -50,7 +54,7 @@ export default {
     }
   },
   async mounted() {
-    await this.getObsMonitor()
+    await this.getAllMonitors()
   }
 }
 </script>
