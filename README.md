@@ -1,14 +1,14 @@
 # MonitoraUFF
 
-This template should help get you started developing with Vue 3 in Vite.
+Monitoring System made with Vue3 and Vuetify
 
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Customize configuration
+## Zoneminder Image Used In the Project
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+https://github.com/zoneminder-containers/zoneminder-base
 
 ## Project Setup
 
