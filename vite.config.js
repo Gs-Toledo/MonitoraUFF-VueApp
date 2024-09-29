@@ -5,6 +5,9 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import vuetify from 'vite-plugin-vuetify';
 
+// eslint-disable-next-line no-undef
+const apiUrl = process.env.VITE_API_URL_LOCALNETWORK || 'http://localhost:88';
+
 
 export default defineConfig({
   plugins: [
@@ -20,16 +23,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://192.168.1.107:88',  // O backend do ZoneMinder está rodando aqui
+        target: apiUrl,  // O backend do ZoneMinder está rodando aqui
         changeOrigin: true,             // Permite mudar a origem
       },
       '/cgi-bin': {
-        target: 'http://192.168.1.107:88',
+        target: apiUrl,
         changeOrigin: true,
       }
     }
   },
   build: {
-    sourcemap: true, // Desativa os mapas de código
+    sourcemap: true,
   },
 })

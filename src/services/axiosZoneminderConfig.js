@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from '@/store';
 
 const axiosZoneminder = axios.create({
-    baseURL: '/api', // Substitua pela URL base do seu ZoneMinder
+    baseURL: '/api',
 });
 
 
