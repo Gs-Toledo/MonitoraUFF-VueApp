@@ -21,7 +21,6 @@ export default {
   data() {
     return {
       monitors: null,
-      streamUrl: '',
       loading: true,
       error: null
     }
@@ -41,7 +40,7 @@ export default {
       }
     },
     generateConnKey() {
-      // Gera um connkey aleatorio para um stream
+      // Gera um connkey aleatorio para um stream (é recomendado pela API)
       return Math.floor(Math.random() * 100000)
     },
     generateStreamUrl(monitorId) {
