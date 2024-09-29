@@ -29,8 +29,9 @@ export default {
         this.monitors = await zoneminderService.getMonitors()
 
         const token = this.getToken
-        const connkey = Math.floor(Math.random() * 100000) // Gera um connkey aleatório
-        this.streamUrl = `/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=5&buffer=1000&monitor=3&token=${token}&connkey=${connkey}`
+        // Gera um connkey aleatorio para um stream
+        const connkey = Math.floor(Math.random() * 100000) 
+        this.streamUrl = `/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=5&buffer=1000&monitor=4&token=${token}&connkey=${connkey}`
       } catch (error) {
         this.error = 'Erro ao carregar stream do monitor'
       } finally {
