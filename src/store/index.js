@@ -27,7 +27,7 @@ export default createStore({
 
                 return token;
             } catch (error) {
-                console.error('Erro ao fazer login', error);
+                console.error('Erro na action de fazer login', error);
                 throw error;
             }
         },
