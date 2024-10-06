@@ -1,4 +1,3 @@
-// src/services/zoneminderService.js
 import axiosZoneminder from '@/services/axiosZoneminderConfig';
 
 export default class ZoneminderService {
@@ -161,9 +160,9 @@ export default class ZoneminderService {
         }
     }
 
-    async getEventsByMonitorId(monitorId) {
+    async getEventsByMonitorId(monitorId, page=1) {
         try {
-            const response = await axiosZoneminder.get(`/events/index/MonitorId:${monitorId}.json`);
+            const response = await axiosZoneminder.get(`/events/index/MonitorId:${monitorId}:${page}.json`);
             console.log(`Eventos do monitor ${monitorId}`, response.data);
             return response.data;
         } catch (error) {
