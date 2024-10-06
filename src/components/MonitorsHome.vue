@@ -4,14 +4,14 @@
   <div v-else-if="!loading && !error" id="monitors-div" class="flex gap-4">
     <div v-for="(monitor, index) in monitors" :key="index">
       <h2 class="text-center">
-        <router-link class="monitor-anchor" :to="'/monitor/' + monitor.Monitor_Status.MonitorId">
+        <router-link class="monitor-anchor" :to="'/monitor/' + monitor.Monitor.Id">
           {{ monitor.Monitor.Name }}</router-link
         >
       </h2>
       <img
         width="500"
         height="600"
-        :src="generateStreamUrl(monitor.Monitor_Status.MonitorId)"
+        :src="generateStreamUrl(monitor.Monitor.Id)"
         alt="Monitor Stream"
         class="monitor"
       />
