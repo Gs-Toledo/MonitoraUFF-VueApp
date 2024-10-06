@@ -2,7 +2,7 @@
   <v-app>
     <app-bar-header />
     <v-main>
-      <v-container class="fill-height">
+      <v-container class="fill-height justify-center">
         <slot></slot>
       </v-container>
     </v-main>

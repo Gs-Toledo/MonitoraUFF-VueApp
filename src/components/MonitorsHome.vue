@@ -1,18 +1,19 @@
 <template>
   <div v-if="loading">Carregando...</div>
   <div v-else-if="error">{{ error }}</div>
-  <div v-else-if="!loading && !error" id="monitors-div">
+  <div v-else-if="!loading && !error" id="monitors-div" class="flex gap-4">
     <div v-for="(monitor, index) in monitors" :key="index">
-      <h4>
-        <router-link :to="'/monitor/' + monitor.Monitor_Status.MonitorId">
+      <h2 class="text-center">
+        <router-link class="monitor-anchor" :to="'/monitor/' + monitor.Monitor_Status.MonitorId">
           {{ monitor.Monitor.Name }}</router-link
         >
-      </h4>
+      </h2>
       <img
         width="500"
         height="600"
         :src="generateStreamUrl(monitor.Monitor_Status.MonitorId)"
         alt="Monitor Stream"
+        class="monitor"
       />
     </div>
   </div>
@@ -21,6 +22,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import ZoneminderService from '@/services/zoneminderService'
+import { generateConnKey, generateStreamUrl } from '@/utils/monitorUtils'
 export default {
   data() {
     return {
@@ -43,15 +45,8 @@ export default {
         this.loading = false
       }
     },
-    generateConnKey() {
-      // Gera um connkey aleatorio para um stream (é recomendado pela API)
-      return Math.floor(Math.random() * 100000)
-    },
-    generateStreamUrl(monitorId) {
-      const baseUri =
-        '/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=5&buffer=1000'
-      return `${baseUri}&monitor=${monitorId}&token=${this.getToken}&connkey=${this.generateConnKey}`
-    }
+    generateConnKey,
+    generateStreamUrl
   },
   async mounted() {
     await this.getAllMonitors()

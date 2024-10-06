@@ -17,7 +17,7 @@ export default class ZoneminderService {
         try {
             const response = await axiosZoneminder.get(`/monitors/${id}.json`);
             console.log('monitor', response.data);
-            return response.data;
+            return response.data.monitor;
         } catch (error) {
             console.error(`Erro ao buscar monitor ${id}:`, error);
             throw error;
