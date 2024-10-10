@@ -9,6 +9,7 @@ Monitoring System made with Vue3 and Vuetify
 ## Zoneminder Image Used In the Project
 
 https://github.com/zoneminder-containers/zoneminder-base
+port 88:80
 
 ## Project Setup
 
