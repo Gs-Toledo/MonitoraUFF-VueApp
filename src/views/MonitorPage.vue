@@ -64,6 +64,7 @@
 
 <script>
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
+/* import axiosZoneminder from '@/services/axiosZoneminderConfig'; */
 import ZoneminderService from '@/services/zoneminderService'
 import { formatToBrazilDate } from '@/utils/formatUtils'
 import { generateStreamUrl } from '@/utils/monitorUtils'
@@ -116,11 +117,12 @@ export default {
       this.dialog = true
     },
     async downloadEvent(eventId) {
-      /*   Construir o evento de download  */
+      let zoneminderService = new ZoneminderService()
+
       try {
-        console.log(`Baixando evento ${eventId}`)
+        await zoneminderService.downloadEvent(eventId)
       } catch (error) {
-        console.error('Erro ao baixar evento:', error)
+        console.error('erro ao baixar o evento')
       }
     },
     generateStreamUrl,

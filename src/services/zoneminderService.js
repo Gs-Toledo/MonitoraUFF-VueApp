@@ -1,4 +1,6 @@
 import axiosZoneminder from '@/services/axiosZoneminderConfig';
+import store from '@/store';
+import axios from 'axios'
 
 export default class ZoneminderService {
     async getMonitors() {
@@ -160,7 +162,7 @@ export default class ZoneminderService {
         }
     }
 
-    async getEventsByMonitorId(monitorId, page=1) {
+    async getEventsByMonitorId(monitorId, page = 1) {
         try {
             const response = await axiosZoneminder.get(`/events/index/MonitorId:${monitorId}:${page}.json`);
             console.log(`Eventos do monitor ${monitorId}`, response.data);
@@ -168,6 +170,32 @@ export default class ZoneminderService {
         } catch (error) {
             console.error(`Erro ao buscar eventos do monitor ${monitorId}:`, error);
             throw error;
+        }
+    }
+
+    async downloadEvent(eventId) {
+       /*  let zoneminderBaseUrl = import.meta.env.VITE_API_URL_LOCALNETWORK */
+        try {
+            const url = `/download/index.php?mode=mp4&view=view_video&eid=${eventId}&auth=${store.getters.getToken}`
+            const response = await axios.get(url, {
+                responseType: 'blob'
+            })
+
+            const blob = new Blob([response.data], { type: 'video/mp4' })
+            console.log(response.data)
+            const downloadUrl = window.URL.createObjectURL(blob)
+
+
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = `evento-${eventId}.mp4`
+            link.click()
+
+
+            window.URL.revokeObjectURL(downloadUrl)
+        } catch (error) {
+            console.error('Erro ao baixar evento:', error)
+            throw error
         }
     }
 }

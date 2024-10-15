@@ -26,6 +26,11 @@ export default defineConfig({
         target: 'http://192.168.1.107:88',  // O backend do ZoneMinder está rodando aqui
         changeOrigin: true,             // Permite mudar a origem
       },
+      '/download': {
+        target: 'http://192.168.1.107:88',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/download/, '')             
+      },
       '/cgi-bin': {
         target: 'http://192.168.1.107:88',
         changeOrigin: true,
