@@ -49,9 +49,9 @@
             <p><strong>Início:</strong> {{ formatToBrazilDate(selectedEvent.Event.StartTime) }}</p>
             <p><strong>Fim:</strong> {{ formatToBrazilDate(selectedEvent.Event.EndTime) }}</p>
             <p><strong>Duração:</strong> {{ selectedEvent.Event.Length }} segundos</p>
-            <v-btn color="primary" @click="downloadEvent(selectedEvent.Event.Id)"
-              >Download Evento</v-btn
-            >
+            <v-btn color="primary" :href="downloadEvent(selectedEvent.Event.Id)" target="_blank">
+              Download Evento
+            </v-btn>
           </v-card-text>
           <v-card-actions>
             <v-btn text @click="dialog = false">Fechar</v-btn>
@@ -116,14 +116,10 @@ export default {
       this.selectedEvent = event
       this.dialog = true
     },
-    async downloadEvent(eventId) {
+    downloadEvent(eventId) {
       let zoneminderService = new ZoneminderService()
 
-      try {
-        await zoneminderService.downloadEvent(eventId)
-      } catch (error) {
-        console.error('erro ao baixar o evento')
-      }
+      return zoneminderService.downloadEvent(eventId)
     },
     generateStreamUrl,
     formatToBrazilDate

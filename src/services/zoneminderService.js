@@ -173,26 +173,28 @@ export default class ZoneminderService {
         }
     }
 
-    async downloadEvent(eventId) {
-       /*  let zoneminderBaseUrl = import.meta.env.VITE_API_URL_LOCALNETWORK */
+    downloadEvent(eventId) {
+        let zoneminderBaseUrl = import.meta.env.VITE_API_URL_LOCALNETWORK
         try {
-            const url = `/download/index.php?mode=mp4&view=view_video&eid=${eventId}&auth=${store.getters.getToken}`
-            const response = await axios.get(url, {
-                responseType: 'blob'
-            })
+            const url = `${zoneminderBaseUrl}/index.php?mode=mp4&view=view_video&eid=${eventId}&auth=${store.getters.getToken}`
 
-            const blob = new Blob([response.data], { type: 'video/mp4' })
-            console.log(response.data)
-            const downloadUrl = window.URL.createObjectURL(blob)
-
-
-            const link = document.createElement('a')
-            link.href = downloadUrl
-            link.download = `evento-${eventId}.mp4`
-            link.click()
-
-
-            window.URL.revokeObjectURL(downloadUrl)
+            return url
+            /*       const response = await axios.get(url, {
+                      responseType: 'blob'
+                  })
+      
+                  const blob = new Blob([response.data], { type: 'video/mp4' })
+                  console.log(response.data)
+                  const downloadUrl = window.URL.createObjectURL(blob)
+      
+      
+                  const link = document.createElement('a')
+                  link.href = downloadUrl
+                  link.download = `evento-${eventId}.mp4`
+                  link.click()
+      
+      
+                  window.URL.revokeObjectURL(downloadUrl) */
         } catch (error) {
             console.error('Erro ao baixar evento:', error)
             throw error
