@@ -49,6 +49,7 @@
             <p><strong>Início:</strong> {{ formatToBrazilDate(selectedEvent.Event.StartTime) }}</p>
             <p><strong>Fim:</strong> {{ formatToBrazilDate(selectedEvent.Event.EndTime) }}</p>
             <p><strong>Duração:</strong> {{ selectedEvent.Event.Length }} segundos</p>
+            <p><router-link class="monitor-anchor mt-2 mb-2" :to="`/monitor/${id}/evento/${selectedEvent.Event.Id}`">Ver evento</router-link></p>
             <v-btn color="primary" :href="downloadEvent(selectedEvent.Event.Id)" target="_blank">
               Download Evento
             </v-btn>

@@ -11,3 +11,7 @@ export function generateStreamUrl(monitorId) {
 
     return `${baseUri}&monitor=${monitorId}&token=${store.getters.getToken}&connkey=${generateConnKey()}`
 }
+
+export function generateEventStreamUrl(monitorId, eventId) {
+    return
+}
