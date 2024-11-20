@@ -1,6 +1,6 @@
 import axiosZoneminder from '@/services/axiosZoneminderConfig';
 import store from '@/store';
-import axios from 'axios'
+/* import axios from 'axios' */
 
 export default class ZoneminderService {
     async getMonitors() {
