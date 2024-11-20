@@ -9,5 +9,5 @@ export function generateStreamUrl(monitorId) {
     const baseUri =
         '/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=5&buffer=1000'
 
-    return `${baseUri}&monitor=${monitorId}&token=${store.getters.getToken}&connkey=${generateConnKey}`
+    return `${baseUri}&monitor=${monitorId}&token=${store.getters.getToken}&connkey=${generateConnKey()}`
 }
