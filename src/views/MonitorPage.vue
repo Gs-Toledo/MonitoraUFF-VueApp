@@ -46,11 +46,11 @@
         <v-card>
           <v-card-title> Detalhes do Evento </v-card-title>
           <v-card-text>
-            <p><strong>Início:</strong> {{ formatToBrazilDate(selectedEvent.Event.StartTime) }}</p>
-            <p><strong>Fim:</strong> {{ formatToBrazilDate(selectedEvent.Event.EndTime) }}</p>
-            <p><strong>Duração:</strong> {{ selectedEvent.Event.Length }} segundos</p>
-            <p><router-link class="monitor-anchor mt-2 mb-2" :to="`/monitor/${id}/evento/${selectedEvent.Event.Id}`">Ver evento</router-link></p>
-            <v-btn color="primary" :href="downloadEvent(selectedEvent.Event.Id)" target="_blank">
+            <p><strong>Início:</strong> {{ formatToBrazilDate(selectedEvent.StartTime) }}</p>
+            <p><strong>Fim:</strong> {{ formatToBrazilDate(selectedEvent.EndTime) }}</p>
+            <p><strong>Duração:</strong> {{ selectedEvent.Length }} segundos</p>
+            <p><router-link class="monitor-anchor mt-2 mb-2" :to="`/monitor/${id}/evento/${selectedEvent.Id}`">Ver evento</router-link></p>
+            <v-btn color="primary" :href="downloadEvent(selectedEvent.Id)" target="_blank">
               Download Evento
             </v-btn>
           </v-card-text>
@@ -114,7 +114,7 @@ export default {
       }
     },
     selectEvent(event) {
-      this.selectedEvent = event
+      this.selectedEvent = event.Event
       this.dialog = true
     },
     downloadEvent(eventId) {

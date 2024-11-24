@@ -7,11 +7,13 @@ export function generateConnKey() {
 
 export function generateStreamUrl(monitorId) {
     const baseUri =
-        '/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=5&buffer=1000'
+        '/cgi-bin/nph-zms?scale=100&width=500&height=600&mode=jpeg&maxfps=30&buffer=1000'
 
     return `${baseUri}&monitor=${monitorId}&token=${store.getters.getToken}&connkey=${generateConnKey()}`
 }
 
-export function generateEventStreamUrl(monitorId, eventId) {
-    return
+export function generateEventStreamUrl(eventId) {
+    // replay=none
+    const baseUri = '/cgi-bin/nph-zms?mode=jpeg&frame=1&scale=0&rate=100&maxfps=30&source=event'
+    return `${baseUri}&event=${eventId}&connkey=${generateConnKey()}&token=${store.getters.getToken}`
 }

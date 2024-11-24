@@ -34,15 +34,13 @@ const routes = [
     name: 'Monitor',
     component: MonitorPage,
     meta: {requiresAuth: true},
-    children: [
-      {
-        path: 'evento/:eventId',
-        props: true,
-        name: 'MonitorEvento',
-        component: EventMonitorPage,
-        meta: { requiresAuth: true }
-      }
-    ]
+  },
+  {
+    path: '/monitor/:id/evento/:eventId',
+    props: true,
+    name: 'MonitorEvento',
+    component: EventMonitorPage,
+    meta: { requiresAuth: true }
   }
 ];
 
