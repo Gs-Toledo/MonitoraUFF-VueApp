@@ -3,6 +3,7 @@ import LoginPage from '@/views/LoginPage.vue'
 import HomePage from '@/views/HomePage.vue'
 import store from '@/store/index';
 import MonitorPage from '@/views/MonitorPage.vue';
+import EventMonitorPage from '@/views/EventMonitorPage.vue';
 
 const routes = [
   {
@@ -32,7 +33,16 @@ const routes = [
     props: true,
     name: 'Monitor',
     component: MonitorPage,
-    meta: {requiresAuth: true}
+    meta: {requiresAuth: true},
+    children: [
+      {
+        path: 'evento/:eventId',
+        props: true,
+        name: 'MonitorEvento',
+        component: EventMonitorPage,
+        meta: { requiresAuth: true }
+      }
+    ]
   }
 ];
 

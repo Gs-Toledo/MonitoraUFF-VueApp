@@ -1,7 +1,7 @@
 <template>
     <base-user-authenticated>
       <div v-if="isLoading">Carregando...</div>
-      <div v-if="!isLoading" class="flex flex-column gap-4">
+      <div v-else-if="!isLoading" class="flex flex-column gap-4">
         <div class="monitor-event-div">
           <h4 class="text-center">
             Evento {{ event }} do Monitor {{ monitor.Monitor.Name }}
@@ -20,7 +20,6 @@
   
   <script>
   import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
-  /* import axiosZoneminder from '@/services/axiosZoneminderConfig'; */
   import ZoneminderService from '@/services/zoneminderService'
   import { formatToBrazilDate } from '@/utils/formatUtils'
   import { generateEventStreamUrl } from '@/utils/monitorUtils'
@@ -33,10 +32,7 @@
     data() {
       return {
         monitor: {},
-        event: [],
-        selectedEvent: {},
-        currentPage: 1,
-        totalPages: 1,
+        event: {},
         isLoading: true,
       }
     },
@@ -45,12 +41,11 @@
         let zoneminderService = new ZoneminderService()
         try {
           this.isLoading = true
-          const response = await zoneminderService.getEventsByMonitorId(this.id, this.currentPage)
-          this.events = response.events
-          this.currentPage = response.pagination.current
-          this.totalPages = response.pagination.pageCount
+          const response = await zoneminderService.getEvent(this.eventId)
+          console.log(this.event)
+          this.event = response
         } catch (error) {
-          console.error('Erro ao buscar eventos:', error)
+          console.error('Erro ao buscar evento:', error)
         } finally {
           this.isLoading = false
         }
