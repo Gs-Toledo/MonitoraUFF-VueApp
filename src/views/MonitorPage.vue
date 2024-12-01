@@ -15,6 +15,13 @@
         />
       </div>
 
+      <div>
+        <video controls width="370" height="130">
+          <source src="@/assets/video-teste.mp4" type="video/mp4" />
+          Seu navegador não é compatível com vídeo HTML5.
+        </video>
+      </div>
+
       <v-card class="mt-4" id="lista-eventos">
         <v-card-title>Histórico de Eventos</v-card-title>
         <v-list two-line>
@@ -49,7 +56,13 @@
             <p><strong>Início:</strong> {{ formatToBrazilDate(selectedEvent.StartTime) }}</p>
             <p><strong>Fim:</strong> {{ formatToBrazilDate(selectedEvent.EndTime) }}</p>
             <p><strong>Duração:</strong> {{ selectedEvent.Length }} segundos</p>
-            <p><router-link class="monitor-anchor mt-2 mb-2" :to="`/monitor/${id}/evento/${selectedEvent.Id}`">Ver evento</router-link></p>
+            <p>
+              <router-link
+                class="monitor-anchor mt-2 mb-2"
+                :to="`/monitor/${id}/evento/${selectedEvent.Id}`"
+                >Ver evento</router-link
+              >
+            </p>
             <v-btn color="primary" :href="downloadEvent(selectedEvent.Id)" target="_blank">
               Download Evento
             </v-btn>
