@@ -15,13 +15,13 @@
         />
       </div>
 
-      <div>
+<!--       <div>
         <video controls width="370" height="130">
           <source src="@/assets/video-teste.mp4" type="video/mp4" />
           Seu navegador não é compatível com vídeo HTML5.
         </video>
       </div>
-
+ -->
       <v-card class="mt-4" id="lista-eventos">
         <v-card-title>Histórico de Eventos</v-card-title>
         <v-list two-line>
