@@ -15,16 +15,41 @@
         />
       </div>
 
-<!--       <div>
+      <!--       <div>
         <video controls width="370" height="130">
           <source src="@/assets/video-teste.mp4" type="video/mp4" />
           Seu navegador não é compatível com vídeo HTML5.
         </video>
       </div>
  -->
+
+      <div class="filter-section mb-4">
+        <div class="flex">
+          <v-text-field
+            label="Data de Início"
+            v-model="filter.startDate"
+            type="date"
+            outlined
+            dense
+          ></v-text-field>
+
+          <v-text-field
+            label="Data de Fim"
+            v-model="filter.endDate"
+            type="date"
+            outlined
+            dense
+          ></v-text-field>
+        </div>
+        <div class="flex justify-between">
+          <v-btn color="grey" @click="limparFiltros"> Limpar </v-btn>
+          <v-btn color="primary" @click="getEventosFromMonitor"> Aplicar Filtro </v-btn>
+        </div>
+      </div>
+
       <v-card class="mt-4" id="lista-eventos">
         <v-card-title>Histórico de Eventos</v-card-title>
-        <v-list two-line>
+        <v-list two-line v-if="events.length > 0">
           <v-list-item
             v-for="event in events"
             :key="event.Event.Id"
@@ -39,6 +64,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
+        <div v-else>Nenhum Evento Encontrado...</div>
 
         <v-pagination
           v-model="currentPage"
@@ -78,7 +104,6 @@
 
 <script>
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
-/* import axiosZoneminder from '@/services/axiosZoneminderConfig'; */
 import ZoneminderService from '@/services/zoneminderService'
 import { formatToBrazilDate } from '@/utils/formatUtils'
 import { generateStreamUrl } from '@/utils/monitorUtils'
@@ -93,6 +118,10 @@ export default {
       monitor: {},
       events: [],
       selectedEvent: {},
+      filter: {
+        startDate: '',
+        endDate: ''
+      },
       currentPage: 1,
       totalPages: 1,
       isLoading: true,
@@ -116,7 +145,15 @@ export default {
       let zoneminderService = new ZoneminderService()
       try {
         this.isLoading = true
-        const response = await zoneminderService.getEventsByMonitorId(this.id, this.currentPage)
+        const filter = {
+          startDate: this.filter.startDate,
+          endDate: this.filter.endDate
+        }
+        const response = await zoneminderService.getEventsByMonitorId(
+          this.id,
+          filter,
+          this.currentPage
+        )
         this.events = response.events
         this.currentPage = response.pagination.current
         this.totalPages = response.pagination.pageCount
@@ -129,6 +166,10 @@ export default {
     selectEvent(event) {
       this.selectedEvent = event.Event
       this.dialog = true
+    },
+    limparFiltros() {
+      ;(this.filter.endDate = ''), (this.filter.startDate = '')
+      this.getEventosFromMonitor()
     },
     downloadEvent(eventId) {
       let zoneminderService = new ZoneminderService()

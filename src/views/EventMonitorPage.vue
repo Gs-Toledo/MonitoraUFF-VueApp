@@ -1,7 +1,7 @@
 <template>
   <base-user-authenticated>
-    <div v-if="isLoading">Carregando...</div>
-    <div v-else-if="!isLoading" class="flex flex-column gap-4">
+    <div v-if="isLoading && !hasError">Carregando...</div>
+    <div v-else-if="!isLoading && !hasError" class="flex flex-column gap-4">
       <div class="monitor-event-div">
         <router-link class="monitor-anchor" :to="`/monitor/${id}`">Voltar</router-link>
         <h4 class="text-center">Monitor {{ monitor.Name }}: Evento {{ event.Event.Name }}</h4>
@@ -24,6 +24,9 @@
         </div>
       </div>
     </div>
+    <div class="errorDiv" v-else-if="hasError && !isLoading">
+      Erro na requisição, tente novamente mais tarde...
+    </div>
   </base-user-authenticated>
 </template>
 
@@ -43,6 +46,7 @@ export default {
       monitor: {},
       event: {},
       isLoading: true,
+      hasError: false,
       isPaused: false
     }
   },
@@ -72,9 +76,11 @@ export default {
     async initEventMonitorRequests() {
       try {
         this.isLoading = true
+        this.hasError = false
         Promise.all([this.getEventosFromMonitor(), this.getAndShowMonitorFromId()])
       } catch (error) {
         console.error('erro na chamada de requisicoes', error)
+        this.hasError = true
       } finally {
         this.isLoading = false
       }

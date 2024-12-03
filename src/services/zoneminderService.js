@@ -162,9 +162,20 @@ export default class ZoneminderService {
         }
     }
 
-    async getEventsByMonitorId(monitorId, page = 1) {
+    async getEventsByMonitorId(monitorId, params, page = 1) {
         try {
-            const response = await axiosZoneminder.get(`/events/index/MonitorId:${monitorId}:${page}.json`);
+            let url = `/events/index/MonitorId:${monitorId}`
+
+            if (params.startDate) {
+                url += `/StartTime >=:${params.startDate}`
+            }
+            if (params.endDate) {
+                url += `/EndTime <=:${params.endDate}`
+            }
+
+            url += `:${page}.json`
+
+            const response = await axiosZoneminder.get(url);
             console.log(`Eventos do monitor ${monitorId}`, response.data);
             return response.data;
         } catch (error) {
