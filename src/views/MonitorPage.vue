@@ -28,7 +28,7 @@
           <v-text-field
             label="Data de Início"
             v-model="filter.startDate"
-            type="date"
+            type="datetime-local"            
             outlined
             dense
           ></v-text-field>
@@ -36,7 +36,7 @@
           <v-text-field
             label="Data de Fim"
             v-model="filter.endDate"
-            type="date"
+            type="datetime-local"
             outlined
             dense
           ></v-text-field>
