@@ -5,13 +5,27 @@
       <div class="monitor-event-div">
         <router-link class="monitor-anchor" :to="`/monitor/${id}`">Voltar</router-link>
         <h4 class="text-center">Monitor {{ monitor.Name }}: Evento {{ event.Event.Name }}</h4>
-        <img
+        <!--   <img
           width="500"
           height="600"
           :src="generateEventStreamUrl(eventId)"
           alt="Monitor Stream"
           class="monitor"
-        />
+        /> -->
+
+        <video
+          autoplay=""
+          controls
+          id="videoobj_html5_api"
+          class="vjs-tech"
+          style="transform: matrix(1, 0, 0, 1, 0, 0)"
+          data-setup='{ "controls": true, "autoplay": true, "preload": "auto", "playbackRates": [ 0,0.25,0.5,1,2,5,10,16], "plugins": { "zoomrotate": { "zoom": "1"}}}'
+          preload="auto"
+          :src="generateEventVideoStreamUrl(eventId)"
+        >
+          <source :src="generateEventVideoStreamUrl(eventId)" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
 
         <div class="flex justify-between mt-6">
           <v-btn color="primary" class="flex-1 mx-2" @click="goBack"> Voltar </v-btn>
@@ -34,7 +48,7 @@
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
 import ZoneminderService from '@/services/zoneminderService'
 import { formatToBrazilDate } from '@/utils/formatUtils'
-import { generateEventStreamUrl } from '@/utils/monitorUtils'
+import { generateEventVideoStreamUrl } from '@/utils/monitorUtils'
 
 export default {
   props: ['eventId', 'id'],
@@ -90,7 +104,7 @@ export default {
 
       return zoneminderService.downloadEvent(eventId)
     },
-    generateEventStreamUrl,
+    generateEventVideoStreamUrl,
     formatToBrazilDate
   },
   async mounted() {
