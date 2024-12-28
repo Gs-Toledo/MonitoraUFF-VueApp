@@ -4,7 +4,7 @@
     <div v-else-if="!isLoading && !hasError" class="flex flex-column gap-4">
       <div class="monitor-event-div">
         <router-link class="monitor-anchor" :to="`/monitor/${id}`">Voltar</router-link>
-        <h4 class="text-center">Monitor {{ monitor.Name }}: Evento {{ event.Event.Name }}</h4>
+        <h4 class="text-center">Monitor {{ monitor.Name }}: Evento {{ event.Event?.Name }}</h4>
         <!--   <img
           width="500"
           height="600"
@@ -27,7 +27,7 @@
           Your browser does not support the video tag.
         </video>
 
-        <div class="flex justify-between mt-6">
+<!--         <div class="flex justify-between mt-6">
           <v-btn color="primary" class="flex-1 mx-2" @click="goBack"> Voltar </v-btn>
 
           <v-btn :color="isPaused ? 'green' : 'red'" class="flex-1 mx-2" @click="togglePause">
@@ -35,7 +35,7 @@
           </v-btn>
 
           <v-btn color="primary" class="flex-1 mx-2" @click="goForward"> Avançar </v-btn>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="errorDiv" v-else-if="hasError && !isLoading">

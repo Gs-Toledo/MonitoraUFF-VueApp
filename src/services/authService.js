@@ -13,6 +13,7 @@ class AuthService {
             );
 
             const response = await axios.post(urlRequest, params);
+
             return response.data;
         } catch (error) {
             console.error('Erro ao realizar o login:', error);
@@ -22,11 +23,12 @@ class AuthService {
 
     static async refreshToken(refreshToken) {
         try {
-            const urlRefresh = '/api/host/login.json';  
+            const urlRefresh = '/api/host/login.json';
             const response = await axios.post(urlRefresh, { refresh_token: refreshToken });
+            console.log('token renovado: ',response.data)
             return response.data;
         } catch (error) {
-            console.error('Erro ao renovar o token:', error);
+            console.error('Erro ao renovar o token pelo service:', error);
             throw error;
         }
     }

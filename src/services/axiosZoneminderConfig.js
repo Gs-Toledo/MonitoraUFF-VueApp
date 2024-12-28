@@ -17,7 +17,6 @@ axiosZoneminder.interceptors.request.use(
             try {
 
                 await store.dispatch('refreshToken');
-
                 token = store.getters.getToken;
             } catch (error) {
                 console.error('Erro ao renovar o token de acesso:', error);

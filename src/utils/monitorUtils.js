@@ -19,7 +19,8 @@ export function generateEventStreamUrl(eventId) {
 }
 
 export function generateEventVideoStreamUrl(eventId) {
-    const baseUri = `http://192.168.1.107:88/index.php?mode=mpeg&format=h264&eid=${eventId}&view=view_video&auth=39d47a3753c77b78599aa4a45a3f1499`;
+    const baseUri = `http://192.168.1.107:88/index.php?mode=mpeg&format=h264&eid=${eventId}&view=view_video&token=${store.getters.getToken}`;
+   /*  http://192.168.1.107:88/index.php?mode=mpeg&format=h264&eid=27&view=view_video&user=admin&pass=admin */
     /* Verificar por que o token nao autentica em alguns usos, parece ser muito grande. */
     /* store.getters.getToken */
     /* http://192.168.1.107:88/index.php?mode=mpeg&format=h264&eid=27&view=view_video&auth=39d47a3753c77b78599aa4a45a3f1499 */
