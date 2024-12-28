@@ -24,8 +24,11 @@ class AuthService {
     static async refreshToken(refreshToken) {
         try {
             const urlRefresh = '/api/host/login.json';
-            const response = await axios.post(urlRefresh, { refresh_token: refreshToken });
-            console.log('token renovado: ',response.data)
+
+            const params = new URLSearchParams({ refresh_token: refreshToken });
+            
+            const response = await axios.post(urlRefresh, params);
+            console.log('token renovado: ', response.data)
             return response.data;
         } catch (error) {
             console.error('Erro ao renovar o token pelo service:', error);
