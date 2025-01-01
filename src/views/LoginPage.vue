@@ -84,6 +84,7 @@ export default {
         await this.login(loginData)
         this.$router.push('/home')
       } catch (error) {
+        console.log(error)
         this.errorMessage = 'Login falhou. Verifique suas credenciais.'
       } finally {
         this.isSendingRequest = false
