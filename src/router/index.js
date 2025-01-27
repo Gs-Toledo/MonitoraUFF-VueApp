@@ -4,6 +4,7 @@ import HomePage from '@/views/HomePage.vue'
 import store from '@/store/index';
 import MonitorPage from '@/views/MonitorPage.vue';
 import EventMonitorPage from '@/views/EventMonitorPage.vue';
+import SelectedMonitorsPage from '@/views/SelectedMonitorsPage.vue';
 
 const routes = [
   {
@@ -26,6 +27,12 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: HomePage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/monitor',
+    name: 'SelectedMonitors',
+    component: SelectedMonitorsPage,
     meta: { requiresAuth: true }
   },
   {
