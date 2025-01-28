@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { formatToBrazilDate } from '@/utils/formatUtils';
+import { formatToBrazilDate } from '@/utils/formatUtils'
 
 export default {
   data() {
@@ -110,10 +110,13 @@ export default {
       this.selectedTime = new Date(this.startTime.getTime() + selectedSeconds * 1000)
       this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
 
-      // Update the marker position to follow the mouse
       this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
 
-      // Redraw timeline to reflect marker's new position
+      this.$emit('update-dates', {
+        startDate: this.startTime,
+        endDate: this.endTime
+      })
+
       this.drawTimeline()
     },
     startClock() {
@@ -149,7 +152,7 @@ export default {
 
 #scrubleft,
 #scrubright {
-  top: 9px
+  top: 9px;
 }
 
 #scrubleft,

@@ -2,7 +2,7 @@
   <base-user-authenticated>
     <div>
       <!-- Barra de timeline -->
-      <timeline-bar />
+      <timeline-bar @update-dates="updateFilterDate" />
 
       <!-- Container principal -->
       <div class="d-flex flex-column p-4">
@@ -42,9 +42,9 @@
         <!-- Exibição dos monitores selecionados -->
         <div class="mt-4" v-if="events.length > 0 && !loading && !isSendingRequest">
           <h3>Eventos Filtrados:</h3>
-          <v-chip v-for="evento in events" :key="evento.id" class="ma-2">
-            {{ evento }}
-          </v-chip>
+          <div v-for="evento in events" :key="evento.id" class="ma-2">
+            {{ evento.Event.Name }}
+          </div>
         </div>
 
         <!-- Exibição de erro, se houver -->
@@ -108,7 +108,8 @@ export default {
             monitorId,
             this.filterDate
           )
-          this.events = [...responseData.events]
+          this.events = [...responseData.events, ...this.events]
+          console.log('eventos', this.events, 'params request', monitorId, this.filterDate)
         }
       } catch (error) {
         this.error = 'Erro ao carregar stream do monitor.'
@@ -116,6 +117,10 @@ export default {
         this.loading = false
         this.isSendingRequest = false
       }
+    },
+    updateFilterDate({ startDate, endDate }) {
+      this.filterDate.startDate = startDate
+      this.filterDate.endDate = endDate
     }
   },
   async mounted() {

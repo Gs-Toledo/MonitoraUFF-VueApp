@@ -164,16 +164,31 @@ export default class ZoneminderService {
 
     async getEventsByMonitorId(monitorId, params, page = 1) {
         try {
-            let url = `/events/index/MonitorId:${monitorId}`
+            let url = `/events/index/MonitorId:${monitorId}`;
+
+            // Função para formatar data no padrão desejado
+            const formatDate = (date) => {
+                if (!date) return null;
+                const pad = (num) => num.toString().padStart(2, '0');
+                const year = date.getFullYear();
+                const month = pad(date.getMonth() + 1);
+                const day = pad(date.getDate());
+                const hours = pad(date.getHours());
+                const minutes = pad(date.getMinutes());
+                const seconds = pad(date.getSeconds());
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            };
 
             if (params.startDate) {
-                url += `/StartTime >=:${params.startDate}`
+                const formattedStartDate = formatDate(params.startDate);
+                url += `/StartTime >=:${formattedStartDate}`;
             }
             if (params.endDate) {
-                url += `/EndTime <=:${params.endDate}`
+                const formattedEndDate = formatDate(params.endDate);
+                url += `/EndTime <=:${formattedEndDate}`;
             }
 
-            url += `:${page}.json`
+            url += `:${page}.json`;
 
             const response = await axiosZoneminder.get(url);
             console.log(`Eventos do monitor ${monitorId}`, response.data);
