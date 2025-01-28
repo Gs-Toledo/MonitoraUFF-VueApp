@@ -32,7 +32,7 @@ export default {
       canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
-      startTime: new Date('2025-01-01T09:15:25'),
+      startTime: new Date('2024-01-01T09:15:25'),
       endTime: new Date('2025-01-01T10:15:25'),
       selectedTime: new Date('2025-01-01T09:33:34'),
       currentMarkerPosition: 0
@@ -113,7 +113,7 @@ export default {
       this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
 
       this.$emit('update-dates', {
-        startDate: this.startTime,
+        startDate: this.selectedTime,
         endDate: this.endTime
       })
 

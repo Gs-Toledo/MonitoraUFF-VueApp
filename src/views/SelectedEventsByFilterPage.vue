@@ -109,7 +109,6 @@ export default {
             this.filterDate
           )
           this.events = [...responseData.events, ...this.events]
-          console.log('eventos', this.events, 'params request', monitorId, this.filterDate)
         }
       } catch (error) {
         this.error = 'Erro ao carregar stream do monitor.'

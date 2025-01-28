@@ -179,16 +179,21 @@ export default class ZoneminderService {
                 return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
             };
 
+
             if (params.startDate) {
-                const formattedStartDate = formatDate(params.startDate);
+                /* const formattedStartDate = formatDate(params.startDate).replace(' ', '%20'); */
+                const formattedStartDate = formatDate(params.startDate)
                 url += `/StartTime >=:${formattedStartDate}`;
             }
             if (params.endDate) {
-                const formattedEndDate = formatDate(params.endDate);
+                /* const formattedEndDate = formatDate(params.endDate).replace(' ', '%20'); */
+                const formattedEndDate = formatDate(params.endDate)
                 url += `/EndTime <=:${formattedEndDate}`;
             }
 
-            url += `:${page}.json`;
+
+            /* url += `:${page}.json`; */
+            url += `.json`;
 
             const response = await axiosZoneminder.get(url);
             console.log(`Eventos do monitor ${monitorId}`, response.data);
