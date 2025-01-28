@@ -4,7 +4,8 @@ import HomePage from '@/views/HomePage.vue'
 import store from '@/store/index';
 import MonitorPage from '@/views/MonitorPage.vue';
 import EventMonitorPage from '@/views/EventMonitorPage.vue';
-import SelectedMonitorsPage from '@/views/SelectedMonitorsPage.vue';
+import AllMonitorsPage from '@/views/AllMonitorsPage.vue';
+import SelectedEventsByFilterPage from '@/views/SelectedEventsByFilterPage.vue';
 
 const routes = [
   {
@@ -31,8 +32,14 @@ const routes = [
   },
   {
     path: '/monitor',
-    name: 'SelectedMonitors',
-    component: SelectedMonitorsPage,
+    name: 'AllMonitorsPage',
+    component: AllMonitorsPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/events-filter',
+    name: 'SelectedEventsByFilter',
+    component: SelectedEventsByFilterPage,
     meta: { requiresAuth: true }
   },
   {
