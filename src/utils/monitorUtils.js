@@ -21,7 +21,7 @@ export function generateEventStreamUrl(eventId) {
 export function generateEventVideoStreamUrl(eventId) {
     const baseIp = import.meta.env.VITE_API_URL_LOCALNETWORK
 
-    const baseUri = `${baseIp}/index.php?mode=mpeg&format=h264&eid=${eventId}&view=view_video&token=${store.getters.getToken}`;
+    const baseUri = `${baseIp}/index.php?mode=mpeg&format=h264&eid=${eventId}&connkey=${generateConnKey()}&view=view_video&token=${store.getters.getToken}`;
 
 
     return baseUri

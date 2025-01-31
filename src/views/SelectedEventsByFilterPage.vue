@@ -44,6 +44,20 @@
           <h3>Eventos Filtrados:</h3>
           <div v-for="evento in events" :key="evento.id" class="ma-2">
             {{ evento.Event.Name }}
+            <video
+              autoplay=""
+              controls
+              id="videoobj_html5_api"
+              class="vjs-tech"
+              style="transform: matrix(1, 0, 0, 1, 0, 0)"
+              data-setup='{ "controls": true, "autoplay": true, "preload": "auto", "playbackRates": [ 0,0.25,0.5,1,2,5,10,16], "plugins": { "zoomrotate": { "zoom": "1"}}}'
+              preload="auto"
+              @loadedmetadata="setInitialVideoTime(evento, $event)"
+              :src="generateEventVideoStreamUrl(evento.Event.Id)"
+            >
+              <source :src="generateEventVideoStreamUrl(evento.Event.Id)" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
 
@@ -60,6 +74,7 @@
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
 import TimelineBar from '@/components/TimelineBar.vue'
 import ZoneminderService from '@/services/zoneminderService'
+import { generateEventVideoStreamUrl } from '@/utils/monitorUtils'
 
 export default {
   components: {
@@ -120,7 +135,29 @@ export default {
     updateFilterDate({ startDate, endDate }) {
       this.filterDate.startDate = startDate
       this.filterDate.endDate = endDate
-    }
+    },
+    setInitialVideoTime(evento, event) {
+      const videoElement = event.target
+      const selectedTime = new Date(this.filterDate.startDate).getTime()
+      this.setVideoTime(evento, videoElement, selectedTime)
+    },
+    setVideoTime(evento, videoElement, selectedTime) {
+      const eventStartTime = new Date(evento.Event.StartDateTime).getTime()
+      const eventEndTime = new Date(evento.Event.EndDateTime).getTime()
+      /* const eventDuration = (eventEndTime - eventStartTime) / 1000 // Convertendo para segundos */
+
+      if (selectedTime < eventStartTime || selectedTime > eventEndTime) {
+        console.warn('Tempo selecionado fora do intervalo do evento.')
+        return
+      }
+
+      const videoTime = (selectedTime - eventStartTime) / 1000
+
+      if (videoElement) {
+        videoElement.currentTime = videoTime
+      }
+    },
+    generateEventVideoStreamUrl
   },
   async mounted() {
     await this.getAllMonitors()
