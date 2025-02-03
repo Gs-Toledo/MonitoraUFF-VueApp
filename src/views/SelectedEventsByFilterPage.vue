@@ -49,15 +49,11 @@
                 @loadeddata
                 @loadedmetadata -->
             <video
-              autoplay=""
+              autoplay
               controls
               id="videoobj_html5_api"
               class="vjs-tech"
-              style="transform: matrix(1, 0, 0, 1, 0, 0)"
-              data-setup='{ "controls": true, "autoplay": true, "preload": "auto", "playbackRates": [ 0,0.25,0.5,1,2,5,10,16], "plugins": { "zoomrotate": { "zoom": "1"}}}'
-              preload="auto"
-              @loadeddata="setVideoTime(evento, $event.target)"
-              :src="generateEventVideoStreamUrl(evento.Event.Id)"
+              @loadeddata="(e) => e.target.currentTime = videoCurrentTimes[evento.Event.Id] || 0"
             >
               <source :src="generateEventVideoStreamUrl(evento.Event.Id)" type="video/mp4" />
               Your browser does not support the video tag.
@@ -65,7 +61,6 @@
           </div>
         </div>
 
-        <!-- Exibição de erro, se houver -->
         <v-alert v-if="error" type="error" class="mt-4">
           {{ error }}
         </v-alert>
@@ -99,6 +94,19 @@ export default {
       loading: true
     }
   },
+  computed: {
+  videoCurrentTimes() {
+    if (!this.filterDate.startDate) return {};
+    console.log('stardate', this.filterDate.startDate)
+    const selectedTime = new Date(this.filterDate.startDate).getTime();
+    return this.events.reduce((acc, evento) => {
+      const eventStart = new Date(evento.Event.StartDateTime).getTime();
+      console.log({selectedTime: selectedTime, eventStart: eventStart})
+      acc[evento.Event.Id] = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0;
+      return acc;
+    }, {});
+  }
+},
   methods: {
     async getAllMonitors() {
       try {

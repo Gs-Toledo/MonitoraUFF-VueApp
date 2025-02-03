@@ -196,7 +196,7 @@ export default class ZoneminderService {
             url += `.json`;
 
             const response = await axiosZoneminder.get(url);
-            console.log(`Eventos do monitor ${monitorId} pagina ${page}`, response.data);
+            console.log(`Eventos do monitor ${monitorId} pagina ${page} de url ${url}`, response.data);
             return response.data;
         } catch (error) {
             console.error(`Erro ao buscar eventos do monitor ${monitorId}:`, error);
