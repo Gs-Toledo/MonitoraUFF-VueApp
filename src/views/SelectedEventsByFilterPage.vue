@@ -45,7 +45,7 @@
           <div v-for="evento in events" :key="evento.id" class="ma-2">
             {{ evento.Event.Name }}
 
-         <!--   @canplay
+            <!--   @canplay
                 @loadeddata
                 @loadedmetadata -->
             <video
@@ -53,7 +53,7 @@
               controls
               id="videoobj_html5_api"
               class="vjs-tech"
-              @loadeddata="(e) => e.target.currentTime = videoCurrentTimes[evento.Event.Id] || 0"
+              @loadedmetadata="setVideoTime(evento, $event.target)"
             >
               <source :src="generateEventVideoStreamUrl(evento.Event.Id)" type="video/mp4" />
               Your browser does not support the video tag.
@@ -95,18 +95,18 @@ export default {
     }
   },
   computed: {
-  videoCurrentTimes() {
-    if (!this.filterDate.startDate) return {};
-    console.log('stardate', this.filterDate.startDate)
-    const selectedTime = new Date(this.filterDate.startDate).getTime();
-    return this.events.reduce((acc, evento) => {
-      const eventStart = new Date(evento.Event.StartDateTime).getTime();
-      console.log({selectedTime: selectedTime, eventStart: eventStart})
-      acc[evento.Event.Id] = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0;
-      return acc;
-    }, {});
-  }
-},
+    videoCurrentTimes() {
+      if (!this.filterDate.startDate) return {}
+      console.log('stardate', this.filterDate.startDate)
+      const selectedTime = new Date(this.filterDate.startDate).getTime()
+      return this.events.reduce((acc, evento) => {
+        const eventStart = new Date(evento.Event.StartDateTime).getTime()
+        console.log({ selectedTime: selectedTime, eventStart: eventStart })
+        acc[evento.Event.Id] = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0
+        return acc
+      }, {})
+    }
+  },
   methods: {
     async getAllMonitors() {
       try {
@@ -149,12 +149,24 @@ export default {
     },
     setVideoTime(evento, videoElement) {
       if (!videoElement || !this.filterDate.startDate) return
-      const eventStart = new Date(evento.Event.StartDateTime).getTime()
-      const selectedTime = new Date(this.filterDate.startDate).getTime()
-      console.log('selectedTime, eventStart' ,selectedTime, eventStart)
-      if (selectedTime >= eventStart) {
-        videoElement.currentTime = (selectedTime - eventStart) / 1000
+
+      const eventStart = new Date(evento.Event.StartDateTime + 'Z').getTime();
+      const selectedTime = this.filterDate.startDate.getTime();
+
+      
+      const newTime = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0
+      console.log('selectedTime, eventStart', selectedTime, eventStart, newTime)
+      console.log('Formato das datas:', evento.Event.StartDateTime, this.filterDate.startDate);
+
+
+      const handleCanPlay = () => {
+        videoElement.currentTime = newTime
+        console.log(`Setando currentTime para: ${newTime}`)
+
+        videoElement.removeEventListener('canplay', handleCanPlay)
       }
+
+      videoElement.addEventListener('canplay', handleCanPlay, { once: true })
     },
     generateEventVideoStreamUrl
   },
