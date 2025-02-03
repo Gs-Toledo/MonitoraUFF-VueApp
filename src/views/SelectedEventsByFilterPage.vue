@@ -44,6 +44,10 @@
           <h3>Eventos Filtrados:</h3>
           <div v-for="evento in events" :key="evento.id" class="ma-2">
             {{ evento.Event.Name }}
+
+         <!--   @canplay
+                @loadeddata
+                @loadedmetadata -->
             <video
               autoplay=""
               controls
@@ -52,7 +56,7 @@
               style="transform: matrix(1, 0, 0, 1, 0, 0)"
               data-setup='{ "controls": true, "autoplay": true, "preload": "auto", "playbackRates": [ 0,0.25,0.5,1,2,5,10,16], "plugins": { "zoomrotate": { "zoom": "1"}}}'
               preload="auto"
-              @loadedmetadata="setInitialVideoTime(evento, $event)"
+              @loadeddata="setVideoTime(evento, $event.target)"
               :src="generateEventVideoStreamUrl(evento.Event.Id)"
             >
               <source :src="generateEventVideoStreamUrl(evento.Event.Id)" type="video/mp4" />
@@ -133,28 +137,15 @@ export default {
       }
     },
     updateFilterDate({ startDate, endDate }) {
-      this.filterDate.startDate = startDate
-      this.filterDate.endDate = endDate
+      this.filterDate = { startDate, endDate }
     },
-    setInitialVideoTime(evento, event) {
-      const videoElement = event.target
+    setVideoTime(evento, videoElement) {
+      if (!videoElement || !this.filterDate.startDate) return
+      const eventStart = new Date(evento.Event.StartDateTime).getTime()
       const selectedTime = new Date(this.filterDate.startDate).getTime()
-      this.setVideoTime(evento, videoElement, selectedTime)
-    },
-    setVideoTime(evento, videoElement, selectedTime) {
-      const eventStartTime = new Date(evento.Event.StartDateTime).getTime()
-      const eventEndTime = new Date(evento.Event.EndDateTime).getTime()
-      /* const eventDuration = (eventEndTime - eventStartTime) / 1000 // Convertendo para segundos */
-
-      if (selectedTime < eventStartTime || selectedTime > eventEndTime) {
-        console.warn('Tempo selecionado fora do intervalo do evento.')
-        return
-      }
-
-      const videoTime = (selectedTime - eventStartTime) / 1000
-
-      if (videoElement) {
-        videoElement.currentTime = videoTime
+      console.log('selectedTime, eventStart' ,selectedTime, eventStart)
+      if (selectedTime >= eventStart) {
+        videoElement.currentTime = (selectedTime - eventStart) / 1000
       }
     },
     generateEventVideoStreamUrl

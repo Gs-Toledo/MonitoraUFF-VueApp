@@ -32,8 +32,8 @@ export default {
       canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
-      startTime: new Date('2024-09-10T09:15:25'),
-      endTime: new Date('2025-01-01T10:15:25'),
+      startTime: new Date('2024-12-09T14:58:25'),
+      endTime: new Date('2024-12-20T10:15:25'),
       selectedTime: new Date('2024-09-10T09:15:25'),
       currentMarkerPosition: 0
     }
@@ -45,6 +45,9 @@ export default {
     formatToBrazilDate,
     drawTimeline() {
       const canvas = this.$refs.timelineCanvas
+
+      if (!canvas) return
+
       const ctx = canvas.getContext('2d')
 
       // Clear canvas
@@ -137,7 +140,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.drawTimeline()
-      this.startClock()
+      /* this.startClock() */
     })
   }
 }
