@@ -1,4 +1,11 @@
 <template>
+   <v-text-field
+      label="Data Início"
+      v-model="selectedDate"
+      type="date"
+      @update:modelValue="updateDate"
+    ></v-text-field>
+
   <div id="timelinediv" class="timeline-container">
     <canvas
       id="timeline"
@@ -26,15 +33,17 @@
 import { formatToBrazilDate } from '@/utils/formatUtils'
 
 export default {
+  emits: ['update-dates'],
   data() {
     return {
       canvasWidth: 896,
       canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
-      startTime: new Date('2024-12-09T14:50:25'),
-      endTime: new Date('2024-12-20T10:15:25'),
-      selectedTime: new Date('2024-12-09T14:59:25'),
+      selectedDate: '2024-12-09',
+      startTime: null,
+      endTime: null,
+      selectedTime: null,
       currentMarkerPosition: 0
     }
   },
@@ -43,9 +52,20 @@ export default {
       return date.toISOString().replace('T', ' ').split('.')[0]
     },
     formatToBrazilDate,
+
+    /** atualiza a timeline para sempre limitar entre 00:00 e 23:59 do dia selecionado */
+    updateDate(newDate) {
+      if (!newDate) return
+
+      const baseDate = new Date(newDate + "T00:00:00");
+      this.startTime = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 0, 0, 0, 0);
+      this.endTime = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 23, 59, 59, 999);
+      this.selectedTime = new Date(this.startTime) 
+
+      this.drawTimeline()
+    },
     drawTimeline() {
       const canvas = this.$refs.timelineCanvas
-
       if (!canvas) return
 
       const ctx = canvas.getContext('2d')
@@ -86,18 +106,22 @@ export default {
       ctx.lineTo(this.currentMarkerPosition, this.canvasHeight)
       ctx.stroke()
     },
+
     startDragging(event) {
       this.dragging = true
       this.updateScrubOutput(event)
     },
+
     drag(event) {
       if (this.dragging) {
         this.updateScrubOutput(event)
       }
     },
+
     stopDragging() {
       this.dragging = false
     },
+
     updateScrubOutput(event) {
       const rect = this.$refs.timelineCanvas.getBoundingClientRect()
       const x = event.clientX - rect.left
@@ -107,8 +131,12 @@ export default {
 
       const selectedSeconds = x * secondsPerPixel
       this.selectedTime = new Date(this.startTime.getTime() + selectedSeconds * 1000)
-      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
 
+      // evita que a hora ultrapasse o intervalo de 00:00 a 23:59
+      if (this.selectedTime < this.startTime) this.selectedTime = new Date(this.startTime)
+      if (this.selectedTime > this.endTime) this.selectedTime = new Date(this.endTime)
+
+      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
       this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
 
       this.$emit('update-dates', {
@@ -118,31 +146,10 @@ export default {
       })
 
       this.drawTimeline()
-    },
-    startClock() {
-      setInterval(() => {
-        // Increment times
-        this.startTime = new Date(this.startTime.getTime() + 1000)
-        this.endTime = new Date(this.endTime.getTime() + 1000)
-        this.selectedTime = new Date(this.selectedTime.getTime() + 1000)
-
-        // Update marker position
-        const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
-        const secondsPerPixel = totalSeconds / this.canvasWidth
-
-        const elapsedSeconds = (this.selectedTime.getTime() - this.startTime.getTime()) / 1000
-        this.currentMarkerPosition = elapsedSeconds / secondsPerPixel
-
-        // Redraw timeline
-        this.drawTimeline()
-      }, 1000)
     }
   },
   mounted() {
-    this.$nextTick(() => {
-      this.drawTimeline()
-      /* this.startClock() */
-    })
+    this.updateDate(this.selectedDate)
   }
 }
 </script>
@@ -165,15 +172,16 @@ export default {
 #scrubright,
 #scruboutput {
   position: absolute;
-
   display: inline-flex;
   font-size: 12px;
   color: #333;
 }
+
 #scruboutput {
   color: blue;
   bottom: 5px;
 }
+
 canvas {
   display: block;
   cursor: pointer;
