@@ -1,10 +1,10 @@
 <template>
-   <v-text-field
-      label="Data Início"
-      v-model="selectedDate"
-      type="date"
-      @update:modelValue="updateDate"
-    ></v-text-field>
+  <v-text-field
+    label="Data Início"
+    v-model="selectedDate"
+    type="date"
+    @update:modelValue="updateDate"
+  ></v-text-field>
 
   <div id="timelinediv" class="timeline-container">
     <canvas
@@ -31,6 +31,7 @@
 
 <script>
 import { formatToBrazilDate } from '@/utils/formatUtils'
+import { parseISO, startOfDay, endOfDay, addSeconds } from 'date-fns'
 
 export default {
   emits: ['update-dates'],
@@ -52,15 +53,22 @@ export default {
       return date.toISOString().replace('T', ' ').split('.')[0]
     },
     formatToBrazilDate,
-
-    /** atualiza a timeline para sempre limitar entre 00:00 e 23:59 do dia selecionado */
     updateDate(newDate) {
       if (!newDate) return
 
-      const baseDate = new Date(newDate + "T00:00:00");
-      this.startTime = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 0, 0, 0, 0);
-      this.endTime = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 23, 59, 59, 999);
-      this.selectedTime = new Date(this.startTime) 
+      const baseDate = parseISO(newDate)
+
+      this.startTime = startOfDay(baseDate)
+      this.endTime = endOfDay(baseDate)
+      this.selectedTime = this.startTime // inicia no começo do dia
+
+
+      this.$emit('update-dates', {
+        startDate: this.startTime,
+        endDate: this.endTime,
+        selectedDate: this.selectedTime
+      })
+
 
       this.drawTimeline()
     },
@@ -126,15 +134,16 @@ export default {
       const rect = this.$refs.timelineCanvas.getBoundingClientRect()
       const x = event.clientX - rect.left
 
-      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
+      const totalSeconds = (this.endTime - this.startTime) / 1000
       const secondsPerPixel = totalSeconds / this.canvasWidth
 
+      // calcula o tempo selecionado
       const selectedSeconds = x * secondsPerPixel
-      this.selectedTime = new Date(this.startTime.getTime() + selectedSeconds * 1000)
+      this.selectedTime = addSeconds(this.startTime, selectedSeconds)
 
-      // evita que a hora ultrapasse o intervalo de 00:00 a 23:59
-      if (this.selectedTime < this.startTime) this.selectedTime = new Date(this.startTime)
-      if (this.selectedTime > this.endTime) this.selectedTime = new Date(this.endTime)
+      // evita ultrapassar os limites de 00:00 a 23:59
+      if (this.selectedTime < this.startTime) this.selectedTime = this.startTime
+      if (this.selectedTime > this.endTime) this.selectedTime = this.endTime
 
       this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
       this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
@@ -145,6 +154,11 @@ export default {
         selectedDate: this.selectedTime
       })
 
+      console.log('valores',{
+        startDate: this.startTime,
+        endDate: this.endTime,
+        selectedDate: this.selectedTime
+      })
       this.drawTimeline()
     }
   },
