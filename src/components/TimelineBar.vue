@@ -112,8 +112,9 @@ export default {
       this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
 
       this.$emit('update-dates', {
-        startDate: this.selectedTime,
-        endDate: this.endTime
+        startDate: this.startTime,
+        endDate: this.endTime,
+        selectedDate: this.selectedTime
       })
 
       this.drawTimeline()

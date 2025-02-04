@@ -26,12 +26,15 @@ class AuthService {
             const urlRefresh = '/api/host/login.json';
 
             const params = new URLSearchParams({ refresh_token: refreshToken });
-            
+
             const response = await axios.post(urlRefresh, params);
             console.log('token renovado: ', response.data)
             return response.data;
         } catch (error) {
             console.error('Erro ao renovar o token pelo service:', error);
+            const { default: router } = await import('@/router');
+
+            this.logout(router)
             throw error;
         }
     }

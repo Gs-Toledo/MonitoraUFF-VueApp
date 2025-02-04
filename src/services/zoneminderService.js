@@ -185,6 +185,8 @@ export default class ZoneminderService {
                 const formattedStartDate = formatDate(params.startDate)
                 url += `/StartTime >=:${formattedStartDate}`;
             }
+
+            
             if (params.endDate) {
                 /* const formattedEndDate = formatDate(params.endDate).replace(' ', '%20'); */
                 const formattedEndDate = formatDate(params.endDate)

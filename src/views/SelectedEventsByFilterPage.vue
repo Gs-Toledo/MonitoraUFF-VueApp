@@ -74,6 +74,7 @@ import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
 import TimelineBar from '@/components/TimelineBar.vue'
 import ZoneminderService from '@/services/zoneminderService'
 import { generateEventVideoStreamUrl } from '@/utils/monitorUtils'
+import { isValid, parse, differenceInSeconds } from 'date-fns'
 
 export default {
   components: {
@@ -85,7 +86,8 @@ export default {
       monitors: [],
       filterDate: {
         startDate: '',
-        endDate: ''
+        endDate: '',
+        selectedDate: ''
       },
       selectedMonitors: [],
       events: [],
@@ -131,33 +133,49 @@ export default {
         this.isSendingRequest = false
       }
     },
-    updateFilterDate({ startDate, endDate }) {
-      this.filterDate = { startDate, endDate }
+    updateFilterDate({ startDate, endDate, selectedDate }) {
+      this.filterDate = { startDate, endDate, selectedDate }
     },
     setVideoTime(evento, videoElement) {
       if (!videoElement || !this.filterDate.startDate) return
 
-      const eventStart = new Date(evento.Event.StartDateTime + 'Z').getTime()
-      const eventEnd = new Date(evento.Event.EndDateTime + 'Z').getTime()
-      const selectedTime = this.filterDate.startDate.getTime()
+      let eventStart = evento.Event.StartDateTime
+      let eventEnd = evento.Event.EndDateTime
+      let selectedTime = this.filterDate.selectedDate
 
-      console.log('teste', {
+      console.log('teste de datas', {
         eventStart: evento.Event.StartDateTime,
         eventEnd: evento.Event.EndDateTime,
-        selectedTime: this.filterDate.startDate
+        selectedTime: this.filterDate.selectedDate
       })
+
+      eventStart =
+        typeof eventStart === 'string'
+          ? parse(eventStart, 'yyyy-MM-dd HH:mm:ss', new Date())
+          : new Date(eventStart)
+      eventEnd =
+        typeof eventEnd === 'string'
+          ? parse(eventEnd, 'yyyy-MM-dd HH:mm:ss', new Date())
+          : new Date(eventEnd)
+      selectedTime = selectedTime instanceof Date ? selectedTime : new Date(selectedTime)
+
+      console.log('Datas convertidas:', { eventStart, eventEnd, selectedTime })
+
+      if (!isValid(eventStart) || !isValid(eventEnd) || !isValid(selectedTime)) {
+        console.error('Data inválida detectada!', { eventStart, eventEnd, selectedTime })
+        return
+      }
 
       let newTime = 0
 
+      console.log('teste do if', selectedTime >= eventStart, selectedTime <= eventEnd)
       if (selectedTime >= eventStart && selectedTime <= eventEnd) {
-        newTime = (selectedTime - eventStart) / 1000
+        newTime = differenceInSeconds(selectedTime, eventStart)
       } else if (selectedTime > eventEnd) {
-        newTime = (eventEnd - eventStart) / 1000 // Define o tempo máximo do evento
+        newTime = differenceInSeconds(eventEnd, eventStart) // tempo max do evento
       }
 
-      console.log('selectedTime, eventStart, eventEnd:', selectedTime, eventStart, eventEnd)
-
-      console.log(`Setando currentTime para: ${newTime}`)
+      console.log(`Setando currentTime para: ${newTime} segundos`)
 
       const handleCanPlay = () => {
         videoElement.currentTime = newTime
