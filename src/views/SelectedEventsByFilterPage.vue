@@ -94,19 +94,6 @@ export default {
       loading: true
     }
   },
-  computed: {
-    videoCurrentTimes() {
-      if (!this.filterDate.startDate) return {}
-      console.log('stardate', this.filterDate.startDate)
-      const selectedTime = new Date(this.filterDate.startDate).getTime()
-      return this.events.reduce((acc, evento) => {
-        const eventStart = new Date(evento.Event.StartDateTime).getTime()
-        console.log({ selectedTime: selectedTime, eventStart: eventStart })
-        acc[evento.Event.Id] = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0
-        return acc
-      }, {})
-    }
-  },
   methods: {
     async getAllMonitors() {
       try {
@@ -150,19 +137,30 @@ export default {
     setVideoTime(evento, videoElement) {
       if (!videoElement || !this.filterDate.startDate) return
 
-      const eventStart = new Date(evento.Event.StartDateTime + 'Z').getTime();
-      const selectedTime = this.filterDate.startDate.getTime();
+      const eventStart = new Date(evento.Event.StartDateTime + 'Z').getTime()
+      const eventEnd = new Date(evento.Event.EndDateTime + 'Z').getTime()
+      const selectedTime = this.filterDate.startDate.getTime()
 
-      
-      const newTime = selectedTime >= eventStart ? (selectedTime - eventStart) / 1000 : 0
-      console.log('selectedTime, eventStart', selectedTime, eventStart, newTime)
-      console.log('Formato das datas:', evento.Event.StartDateTime, this.filterDate.startDate);
+      console.log('teste', {
+        eventStart: evento.Event.StartDateTime,
+        eventEnd: evento.Event.EndDateTime,
+        selectedTime: this.filterDate.startDate
+      })
 
+      let newTime = 0
+
+      if (selectedTime >= eventStart && selectedTime <= eventEnd) {
+        newTime = (selectedTime - eventStart) / 1000
+      } else if (selectedTime > eventEnd) {
+        newTime = (eventEnd - eventStart) / 1000 // Define o tempo máximo do evento
+      }
+
+      console.log('selectedTime, eventStart, eventEnd:', selectedTime, eventStart, eventEnd)
+
+      console.log(`Setando currentTime para: ${newTime}`)
 
       const handleCanPlay = () => {
         videoElement.currentTime = newTime
-        console.log(`Setando currentTime para: ${newTime}`)
-
         videoElement.removeEventListener('canplay', handleCanPlay)
       }
 

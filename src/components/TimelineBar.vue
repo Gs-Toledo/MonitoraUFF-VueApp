@@ -32,7 +32,7 @@ export default {
       canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
-      startTime: new Date('2024-12-09T14:58:25'),
+      startTime: new Date('2024-12-09T14:50:25'),
       endTime: new Date('2024-12-20T10:15:25'),
       selectedTime: new Date('2024-12-09T14:59:25'),
       currentMarkerPosition: 0
