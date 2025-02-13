@@ -124,7 +124,7 @@ export default class ZoneminderService {
             console.log('events', response.data);
             return response.data;
         } catch (error) {
-            console.error('Erro ao buscar eventos:', error);
+            console.error('Erro ao buscar Gravações:', error);
             throw error;
         }
     }
@@ -135,7 +135,7 @@ export default class ZoneminderService {
             console.log('event', response.data);
             return response.data;
         } catch (error) {
-            console.error(`Erro ao buscar evento ${id}:`, error);
+            console.error(`Erro ao buscar gravação ${id}:`, error);
             throw error;
         }
     }
@@ -143,10 +143,10 @@ export default class ZoneminderService {
     async editEvent(id, eventData) {
         try {
             const response = await axiosZoneminder.put(`/events/${id}.json`, { Event: eventData });
-            console.log(`Evento ${id} editado`, response.data);
+            console.log(`gravação ${id} editado`, response.data);
             return response.data;
         } catch (error) {
-            console.error(`Erro ao editar evento ${id}:`, error);
+            console.error(`Erro ao editar gravação ${id}:`, error);
             throw error;
         }
     }
@@ -198,10 +198,10 @@ export default class ZoneminderService {
             url += `.json`;
 
             const response = await axiosZoneminder.get(url);
-            console.log(`Eventos do monitor ${monitorId} pagina ${page} de url ${url}`, response.data);
+            console.log(`gravaçoes da camera ${monitorId} pagina ${page} de url ${url}`, response.data);
             return response.data;
         } catch (error) {
-            console.error(`Erro ao buscar eventos do monitor ${monitorId}:`, error);
+            console.error(`Erro ao buscar gravaçoes da camera ${monitorId}:`, error);
             throw error;
         }
     }

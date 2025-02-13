@@ -41,7 +41,7 @@
 
         <!-- Exibição dos monitores selecionados -->
         <div class="mt-4" v-if="events.length > 0 && !loading && !isSendingRequest">
-          <h3>Eventos Filtrados:</h3>
+          <h3>Gravações Filtradas:</h3>
           <div v-for="evento in events" :key="evento.id" class="ma-2">
             {{ evento.Event.Name }}
 
@@ -129,7 +129,7 @@ export default {
           this.events = [...responseData.events, ...this.events]
         }
       } catch (error) {
-        this.error = 'Erro ao carregar stream do monitor.'
+        this.error = 'Erro ao carregar stream da camera.'
       } finally {
         this.loading = false
         this.isSendingRequest = false

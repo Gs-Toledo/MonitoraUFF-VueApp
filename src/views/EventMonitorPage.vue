@@ -3,7 +3,7 @@
     <div v-if="isLoading && !hasError">Carregando...</div>
     <div v-else-if="!isLoading && !hasError" class="flex flex-column gap-4">
       <div class="monitor-event-div">
-        <router-link class="monitor-anchor" :to="`/monitor/${id}`">Voltar</router-link>
+        <router-link class="monitor-anchor" :to="`/cameras/${id}`">Voltar</router-link>
         <h4 class="text-center">Monitor {{ monitor.Name }}: Evento {{ event.Event?.Name }}</h4>
         <!--   <img
           width="500"

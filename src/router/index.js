@@ -31,26 +31,26 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/monitor',
+    path: '/cameras',
     name: 'AllMonitorsPage',
     component: AllMonitorsPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/events-filter',
+    path: '/filtro-gravacoes',
     name: 'SelectedEventsByFilter',
     component: SelectedEventsByFilterPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/monitor/:id',
+    path: '/cameras/:id',
     props: true,
     name: 'Monitor',
     component: MonitorPage,
     meta: {requiresAuth: true},
   },
   {
-    path: '/monitor/:id/evento/:eventId',
+    path: '/cameras/:id/gravacao/:eventId',
     props: true,
     name: 'MonitorEvento',
     component: EventMonitorPage,

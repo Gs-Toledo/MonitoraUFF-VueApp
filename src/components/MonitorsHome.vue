@@ -4,7 +4,7 @@
   <div v-else-if="!loading && !error" id="monitors-div" class="flex gap-4">
     <div v-for="(monitor, index) in monitors" :key="index">
       <h2 class="text-center">
-        <router-link class="monitor-anchor" :to="'/monitor/' + monitor.Monitor.Id">
+        <router-link class="monitor-anchor" :to="'/cameras/' + monitor.Monitor.Id">
           {{ monitor.Monitor.Name }}</router-link
         >
       </h2>

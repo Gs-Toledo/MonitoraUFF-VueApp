@@ -38,8 +38,8 @@ export default {
     return {
       navigationItems: [
         { title: 'Home', icon: 'mdi-home', route: '/home' },
-        { title: 'Monitores', icon: 'mdi-monitor', route: '/monitor' },
-        { title: 'Filtro de Eventos', icon: 'mdi-film', route: '/events-filter' }
+        { title: 'Câmeras', icon: 'mdi-monitor', route: '/cameras' },
+        { title: 'Filtro de Gravações', icon: 'mdi-film', route: '/filtro-gravacoes' }
       ]
     }
   },

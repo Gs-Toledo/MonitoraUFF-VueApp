@@ -48,7 +48,7 @@
       </div>
 
       <v-card class="mt-4" id="lista-eventos">
-        <v-card-title>Histórico de Eventos</v-card-title>
+        <v-card-title>Histórico de Gravações</v-card-title>
         <v-list two-line v-if="events.length > 0">
           <v-list-item
             v-for="event in events"
@@ -57,14 +57,14 @@
             class="event-list-item mb-2"
           >
             <v-list-item-content>
-              <v-list-item-title>Evento {{ event.Event.Id }}</v-list-item-title>
+              <v-list-item-title>Gravação {{ event.Event.Id }}</v-list-item-title>
               <v-list-item-subtitle
                 >{{ formatToBrazilDate(event.Event.StartTime) }}
               </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <div v-else>Nenhum Evento Encontrado...</div>
+        <div v-else>Nenhuma Gravação Encontrada...</div>
 
         <v-pagination
           v-model="currentPage"
@@ -85,12 +85,12 @@
             <p>
               <router-link
                 class="monitor-anchor mt-2 mb-2"
-                :to="`/monitor/${id}/evento/${selectedEvent.Id}`"
-                >Ver evento</router-link
+                :to="`/cameras/${id}/gravacao/${selectedEvent.Id}`"
+                >Ver Gravação</router-link
               >
             </p>
             <v-btn color="primary" :href="downloadEvent(selectedEvent.Id)" target="_blank">
-              Download Evento
+              Download Gravação
             </v-btn>
           </v-card-text>
           <v-card-actions>
