@@ -23,7 +23,7 @@
             :items="monitors"
             item-value="id"
             item-title="name"
-            label="Selecione os Monitores"
+            label="Selecione as Câmeras"
             multiple
             outlined
             class="mt-4"
@@ -39,7 +39,7 @@
           >
         </template>
 
-        <!-- Exibição dos monitores selecionados -->
+        <!-- Exibição das Câmeras selecionados -->
         <div class="mt-4" v-if="events.length > 0 && !loading && !isSendingRequest">
           <h3>Gravações Filtradas:</h3>
           <div v-for="evento in events" :key="evento.id" class="ma-2">
