@@ -2,7 +2,7 @@
   <base-user-authenticated>
     <div>
       <!-- Barra de timeline -->
-      <timeline-bar @update-dates="updateFilterDate" />
+      <timeline-bar @update-dates="updateFilterDate" :events="events" />
 
       <!-- Container principal -->
       <div class="d-flex flex-column p-4">
@@ -40,10 +40,10 @@
         </template>
 
         <!-- Exibição das Câmeras selecionados -->
-        <div class="mt-4" v-if="events.length > 0 && !loading && !isSendingRequest">
+        <div class="mt-4" v-if="filteredEvents.length > 0 && !loading && !isSendingRequest">
           <h3>Gravações Filtradas:</h3>
-          <div v-for="evento in events" :key="evento.id" class="ma-2">
-            {{ evento.Event.Name }}
+          <div v-for="evento in filteredEvents" :key="evento.id" class="ma-2">
+            <b>{{ evento.monitorName }}</b> - Gravação: {{ evento.Event.Name }}
 
             <!--   @canplay
                 @loadeddata
@@ -59,6 +59,9 @@
               Your browser does not support the video tag.
             </video>
           </div>
+        </div>
+        <div class="mt4" v-else-if="filteredEvents.length == 0 && !loading && !isSendingRequest">
+          <p>{{ resultMsg }}</p>
         </div>
 
         <v-alert v-if="error" type="error" class="mt-4">
@@ -91,6 +94,8 @@ export default {
       },
       selectedMonitors: [],
       events: [],
+      filteredEvents: [],
+      resultMsg: null,
       isSendingRequest: false,
       error: '',
       loading: true
@@ -114,22 +119,61 @@ export default {
       }
     },
     async getEventsByMonitorId() {
+      if (this.selectedMonitors.length == 0) {
+        alert("Escolha ao menos uma camera")
+      } else if (this.filterDate.selectedDate == null) {
+        alert("Selecione uma data. ")
+      }
+
       try {
         this.isSendingRequest = true
         this.loading = true
         const zoneminderService = new ZoneminderService()
         this.events = []
 
-        console.log('before request', this.filterDate)
         for (let monitorId of this.selectedMonitors) {
           const responseData = await zoneminderService.getEventsByMonitorId(
             monitorId,
             this.filterDate
           )
-          this.events = [...responseData.events, ...this.events]
+
+          this.events = [...this.events, responseData.events]
+
+          const selectedTime = new Date(this.filterDate.selectedDate)
+          let closestEvent = null
+          let minTimeDiff = Infinity
+
+          responseData.events.forEach((evento) => {
+            const monitor = this.monitors.find((m) => m.id === monitorId)
+            evento.monitorName = monitor ? monitor.name : 'Camera Desconhecida'
+
+            const eventStart = new Date(evento.Event.StartDateTime)
+            const eventEnd = new Date(evento.Event.EndDateTime)
+
+            if (evento.MonitorId == monitorId) {
+              // coloque no evento o nome do monitor para exibir no template
+            }
+
+            if (selectedTime >= eventStart && selectedTime <= eventEnd) {
+              const timeDiff = Math.abs(selectedTime - eventStart)
+              if (timeDiff < minTimeDiff) {
+                minTimeDiff = timeDiff
+                closestEvent = evento
+              }
+            }
+          })
+
+          if (closestEvent) {
+            this.filteredEvents.push(closestEvent)
+          }
         }
+
+        if (this.filteredEvents.length == 0) {
+          this.resultMsg = 'Nenhuma Gravação Encontrada'
+        }
+
       } catch (error) {
-        this.error = 'Erro ao carregar stream da camera.'
+        this.error = 'Erro ao carregar stream da câmera.'
       } finally {
         this.loading = false
         this.isSendingRequest = false

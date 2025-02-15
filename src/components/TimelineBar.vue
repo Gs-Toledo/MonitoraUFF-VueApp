@@ -31,10 +31,16 @@
 
 <script>
 import { formatToBrazilDate } from '@/utils/formatUtils'
-import { parseISO, startOfDay, endOfDay, addSeconds } from 'date-fns'
+import { parseISO, startOfDay, endOfDay, addSeconds, isSameDay } from 'date-fns'
 
 export default {
   emits: ['update-dates'],
+  props: {
+    events: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       canvasWidth: 896,
@@ -45,7 +51,8 @@ export default {
       startTime: null,
       endTime: null,
       selectedTime: null,
-      currentMarkerPosition: 0
+      currentMarkerPosition: 0,
+      eventMarkers: [],
     }
   },
   methods: {
@@ -53,15 +60,20 @@ export default {
       return date.toISOString().replace('T', ' ').split('.')[0]
     },
     formatToBrazilDate,
+
     updateDate(newDate) {
       if (!newDate) return
 
       const baseDate = parseISO(newDate)
-
       this.startTime = startOfDay(baseDate)
       this.endTime = endOfDay(baseDate)
-      this.selectedTime = this.startTime // inicia no começo do dia
+      this.selectedTime = this.startTime 
 
+      this.eventMarkers = this.events
+        .filter(event => isSameDay(parseISO(event.Event.StartDateTime), baseDate))
+        .map(event => parseISO(event.Event.StartDateTime))
+
+        console.log('teste event markers',this.eventMarkers)
 
       this.$emit('update-dates', {
         startDate: this.startTime,
@@ -69,9 +81,9 @@ export default {
         selectedDate: this.selectedTime
       })
 
-
       this.drawTimeline()
     },
+
     drawTimeline() {
       const canvas = this.$refs.timelineCanvas
       if (!canvas) return
@@ -106,6 +118,16 @@ export default {
         ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25)
       }
 
+      // Desenha marcadores de eventos
+      this.eventMarkers.forEach(eventTime => {
+        const eventPosition = (eventTime.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
+
+        ctx.fillStyle = 'blue'
+        ctx.beginPath()
+        ctx.arc(eventPosition, this.canvasHeight / 2, 5, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
       // Draw vertical marker for current time
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 2
@@ -137,11 +159,10 @@ export default {
       const totalSeconds = (this.endTime - this.startTime) / 1000
       const secondsPerPixel = totalSeconds / this.canvasWidth
 
-      // calcula o tempo selecionado
+    
       const selectedSeconds = x * secondsPerPixel
       this.selectedTime = addSeconds(this.startTime, selectedSeconds)
 
-      // evita ultrapassar os limites de 00:00 a 23:59
       if (this.selectedTime < this.startTime) this.selectedTime = this.startTime
       if (this.selectedTime > this.endTime) this.selectedTime = this.endTime
 
@@ -154,11 +175,6 @@ export default {
         selectedDate: this.selectedTime
       })
 
-      console.log('valores',{
-        startDate: this.startTime,
-        endDate: this.endTime,
-        selectedDate: this.selectedTime
-      })
       this.drawTimeline()
     }
   },
@@ -167,6 +183,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .timeline-container {
