@@ -1,12 +1,14 @@
 <template>
-  <v-text-field
-    label="Data Início"
-    v-model="selectedDate"
-    type="date"
-    @update:modelValue="updateDate"
-  ></v-text-field>
+  <div>
+    <v-text-field
+      label="Data Início"
+      v-model="selectedDate"
+      type="date"
+      @update:modelValue="updateDate"
+    ></v-text-field>
+  </div>
 
-  <div id="timelinediv" class="timeline-container">
+  <div id="timelinediv" class="w-full overflow-x-auto" v-show="events.length > 0">
     <canvas
       id="timeline"
       ref="timelineCanvas"
@@ -31,7 +33,7 @@
 
 <script>
 import { formatToBrazilDate } from '@/utils/formatUtils'
-import { parseISO, startOfDay, endOfDay, addSeconds, isSameDay } from 'date-fns'
+import { parseISO, startOfDay, endOfDay, isSameDay } from 'date-fns'
 
 export default {
   emits: ['update-dates'],
@@ -53,6 +55,17 @@ export default {
       selectedTime: null,
       currentMarkerPosition: 0,
       eventMarkers: [],
+      filtered: false, // Flag para controlar quando os eventos devem ser desenhados
+    }
+  },
+  watch: {
+    events: {
+      immediate: false,
+      handler(newEvents) {
+        if (this.filtered && newEvents.length > 0) {
+          this.processEvents();
+        }
+      }
     }
   },
   methods: {
@@ -69,122 +82,84 @@ export default {
       this.endTime = endOfDay(baseDate)
       this.selectedTime = this.startTime 
 
-      this.eventMarkers = this.events
-        .filter(event => isSameDay(parseISO(event.Event.StartDateTime), baseDate))
-        .map(event => parseISO(event.Event.StartDateTime))
-
-        console.log('teste event markers',this.eventMarkers)
-
       this.$emit('update-dates', {
         startDate: this.startTime,
         endDate: this.endTime,
         selectedDate: this.selectedTime
       })
+    },
 
-      this.drawTimeline()
+    applyFilter() {
+      this.filtered = true;
+      this.processEvents();
+    },
+
+    processEvents() {
+      this.eventMarkers = this.events
+        .filter(event => isSameDay(parseISO(event.Event.StartDateTime), this.startTime))
+        .map(event => ({
+          start: parseISO(event.Event.StartDateTime),
+          end: parseISO(event.Event.EndDateTime)
+        }));
+
+      this.drawTimeline();
     },
 
     drawTimeline() {
-      const canvas = this.$refs.timelineCanvas
-      if (!canvas) return
+      const canvas = this.$refs.timelineCanvas;
+      if (!canvas) return;
 
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d');
 
-      // Clear canvas
-      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      ctx.fillStyle = '#eaeaea';
+      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-      // Draw background
-      ctx.fillStyle = '#eaeaea'
-      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 1;
 
-      // Draw time markers
-      ctx.strokeStyle = '#555'
-      ctx.lineWidth = 1
-
-      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
-      const secondsPerPixel = totalSeconds / this.canvasWidth
+      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000;
+      const secondsPerPixel = totalSeconds / this.canvasWidth;
 
       for (let x = 0; x <= this.canvasWidth; x += 50) {
-        const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000)
-        const timeLabel = this.formatTime(timeAtMarker).split(' ')[1]
+        const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000);
+        const timeLabel = this.formatTime(timeAtMarker).split(' ')[1];
 
-        ctx.beginPath()
-        ctx.moveTo(x, this.canvasHeight - 20)
-        ctx.lineTo(x, this.canvasHeight)
-        ctx.stroke()
+        ctx.beginPath();
+        ctx.moveTo(x, this.canvasHeight - 20);
+        ctx.lineTo(x, this.canvasHeight);
+        ctx.stroke();
 
-        ctx.fillStyle = '#000'
-        ctx.font = '10px Arial'
-        ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25)
+        ctx.fillStyle = '#000';
+        ctx.font = '10px Arial';
+        ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25);
       }
 
-      // Desenha marcadores de eventos
-      this.eventMarkers.forEach(eventTime => {
-        const eventPosition = (eventTime.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
+      this.eventMarkers.forEach(event => {
+        const eventStartPosition = (event.start.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel;
+        const eventEndPosition = (event.end.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel;
 
-        ctx.fillStyle = 'blue'
-        ctx.beginPath()
-        ctx.arc(eventPosition, this.canvasHeight / 2, 5, 0, Math.PI * 2)
-        ctx.fill()
-      })
+        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+        ctx.fillRect(eventStartPosition, 0, eventEndPosition - eventStartPosition, this.canvasHeight);
+      });
 
-      // Draw vertical marker for current time
-      ctx.strokeStyle = 'red'
-      ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.moveTo(this.currentMarkerPosition, 0)
-      ctx.lineTo(this.currentMarkerPosition, this.canvasHeight)
-      ctx.stroke()
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(this.currentMarkerPosition, 0);
+      ctx.lineTo(this.currentMarkerPosition, this.canvasHeight);
+      ctx.stroke();
     },
-
-    startDragging(event) {
-      this.dragging = true
-      this.updateScrubOutput(event)
-    },
-
-    drag(event) {
-      if (this.dragging) {
-        this.updateScrubOutput(event)
-      }
-    },
-
-    stopDragging() {
-      this.dragging = false
-    },
-
-    updateScrubOutput(event) {
-      const rect = this.$refs.timelineCanvas.getBoundingClientRect()
-      const x = event.clientX - rect.left
-
-      const totalSeconds = (this.endTime - this.startTime) / 1000
-      const secondsPerPixel = totalSeconds / this.canvasWidth
-
-    
-      const selectedSeconds = x * secondsPerPixel
-      this.selectedTime = addSeconds(this.startTime, selectedSeconds)
-
-      if (this.selectedTime < this.startTime) this.selectedTime = this.startTime
-      if (this.selectedTime > this.endTime) this.selectedTime = this.endTime
-
-      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
-      this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
-
-      this.$emit('update-dates', {
-        startDate: this.startTime,
-        endDate: this.endTime,
-        selectedDate: this.selectedTime
-      })
-
-      this.drawTimeline()
-    }
   },
   mounted() {
-    this.updateDate(this.selectedDate)
+    this.updateDate(this.selectedDate);
+  this.$nextTick(() => {
+    this.processEvents()
+    this.drawTimeline();
+  });
   }
 }
 </script>
-
-
 <style scoped>
 .timeline-container {
   position: relative;

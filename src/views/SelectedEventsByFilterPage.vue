@@ -1,23 +1,21 @@
 <template>
   <base-user-authenticated>
-    <div>
+    <div class="h-full w-full">
       <!-- Barra de timeline -->
-      <timeline-bar @update-dates="updateFilterDate" :events="events" />
+      <timeline-bar
+        @update-dates="updateFilterDate"
+        :events="events"
+       
+      />
 
-      <!-- Container principal -->
-      <div class="d-flex flex-column p-4">
+      <div class="flex flex-col p-4 space-y-4">
         <!-- Skeleton Loader para o select -->
         <template v-if="loading">
-          <v-skeleton-loader
-            class="mx-auto"
-            :loading="loading"
-            type="list-item"
-            max-height="50px"
-          />
+          <v-skeleton-loader class="w-full" type="list-item" max-height="50px" />
         </template>
 
         <!-- Select Múltiplo -->
-        <template v-else>
+        <div v-else class="w-full">
           <v-select
             v-model="selectedMonitors"
             :items="monitors"
@@ -26,33 +24,36 @@
             label="Selecione as Câmeras"
             multiple
             outlined
-            class="mt-4"
+            class="w-full"
           ></v-select>
           <v-btn
             block
-            class="mb-8"
+            class="mt-4"
             color="blue"
             variant="tonal"
             :disabled="isSendingRequest"
             @click="getEventsByMonitorId"
-            >Filtrar</v-btn
           >
-        </template>
+            Filtrar
+          </v-btn>
+        </div>
 
-        <!-- Exibição das Câmeras selecionados -->
-        <div class="mt-4" v-if="filteredEvents.length > 0 && !loading && !isSendingRequest">
-          <h3>Gravações Filtradas:</h3>
-          <div v-for="evento in filteredEvents" :key="evento.id" class="ma-2">
+        <!-- Exibição das Câmeras selecionadas -->
+        <div
+          v-if="filteredEvents.length > 0 && !loading && !isSendingRequest"
+          class="w-full space-y-4"
+        >
+          <h3 class="text-xl font-bold">Gravações Filtradas:</h3>
+          <div
+            v-for="evento in filteredEvents"
+            :key="evento.id"
+            class="w-full p-4 border rounded-lg shadow-sm"
+          >
             <b>{{ evento.monitorName }}</b> - Gravação: {{ evento.Event.Name }}
-
-            <!--   @canplay
-                @loadeddata
-                @loadedmetadata -->
             <video
               autoplay
               controls
-              id="videoobj_html5_api"
-              class="vjs-tech"
+              class="w-full mt-2 rounded-lg"
               @loadedmetadata="setVideoTime(evento, $event.target)"
             >
               <source :src="generateEventVideoStreamUrl(evento.Event.Id)" type="video/mp4" />
@@ -60,8 +61,13 @@
             </video>
           </div>
         </div>
-        <div class="mt4" v-else-if="filteredEvents.length == 0 && !loading && !isSendingRequest">
-          <p>{{ resultMsg }}</p>
+
+        <!-- Mensagem quando não há gravações -->
+        <div
+          v-else-if="filteredEvents.length == 0 && !loading && !isSendingRequest"
+          class="w-full text-center py-8"
+        >
+          <p class="text-gray-600">{{ resultMsg }}</p>
         </div>
 
         <v-alert v-if="error" type="error" class="mt-4">
@@ -71,7 +77,6 @@
     </div>
   </base-user-authenticated>
 </template>
-
 <script>
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
 import TimelineBar from '@/components/TimelineBar.vue'
@@ -120,9 +125,9 @@ export default {
     },
     async getEventsByMonitorId() {
       if (this.selectedMonitors.length == 0) {
-        alert("Escolha ao menos uma camera")
+        alert('Escolha ao menos uma camera')
       } else if (this.filterDate.selectedDate == null) {
-        alert("Selecione uma data. ")
+        alert('Selecione uma data. ')
       }
 
       try {
@@ -137,7 +142,7 @@ export default {
             this.filterDate
           )
 
-          this.events = [...this.events, responseData.events]
+          this.events = [...this.events, ...responseData.events]
 
           const selectedTime = new Date(this.filterDate.selectedDate)
           let closestEvent = null
@@ -171,7 +176,6 @@ export default {
         if (this.filteredEvents.length == 0) {
           this.resultMsg = 'Nenhuma Gravação Encontrada'
         }
-
       } catch (error) {
         this.error = 'Erro ao carregar stream da câmera.'
       } finally {
