@@ -156,10 +156,6 @@ export default {
             const eventStart = new Date(evento.Event.StartDateTime)
             const eventEnd = new Date(evento.Event.EndDateTime)
 
-            if (evento.MonitorId == monitorId) {
-              // coloque no evento o nome do monitor para exibir no template
-            }
-
             if (selectedTime >= eventStart && selectedTime <= eventEnd) {
               const timeDiff = Math.abs(selectedTime - eventStart)
               if (timeDiff < minTimeDiff) {

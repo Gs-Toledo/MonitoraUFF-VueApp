@@ -8,20 +8,19 @@
     ></v-text-field>
   </div>
 
-  <div id="timelinediv" class="relative w-full overflow-x-auto" v-show="events.length > 0">
+  <div class="timeline-container"  v-show="events.length > 0">
     <canvas
       id="timeline"
       ref="timelineCanvas"
-      class="w-full"
-      :width="canvasWidth"
-      :height="canvasHeight"
+      :width="800"
+      :height="100"
       @mousedown="startDragging"
       @mousemove="drag"
       @mouseup="stopDragging"
       @mouseleave="stopDragging"
     ></canvas>
     <span id="scrubleft">{{ formatToBrazilDate(startTime) }}</span>
-    <span id="scrubright" :style="{ left: canvasWidth - 160 + 'px' }">
+    <span id="scrubright">
       {{ formatToBrazilDate(endTime) }}
     </span>
     <span id="scruboutput" :style="{ left: scrubOutputPosition + 'px' }">
@@ -44,8 +43,6 @@ export default {
   },
   data() {
     return {
-      canvasWidth: window.innerWidth * 0.9,
-      canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
       selectedDate: '2024-12-09',
@@ -106,14 +103,14 @@ export default {
     },
     updateScrubOutput(event) {
       const rect = this.$refs.timelineCanvas.getBoundingClientRect()
-      const x = Math.max(0, Math.min(event.clientX - rect.left, this.canvasWidth))
+      const x = Math.max(0, Math.min(event.clientX - rect.left, 800))
 
       const totalSeconds = (this.endTime - this.startTime) / 1000
-      const secondsPerPixel = totalSeconds / this.canvasWidth
+      const secondsPerPixel = totalSeconds / 800
       const selectedSeconds = x * secondsPerPixel
       this.selectedTime = addSeconds(this.startTime, selectedSeconds)
 
-      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
+      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, 740))
       this.currentMarkerPosition = x
 
       this.$emit('update-dates', {
@@ -129,50 +126,43 @@ export default {
       if (!canvas) return
 
       const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+      ctx.clearRect(0, 0, 800, 100)
       ctx.fillStyle = '#eaeaea'
-      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
+      ctx.fillRect(0, 0, 800, 100)
 
       ctx.strokeStyle = '#555'
       ctx.lineWidth = 1
 
       const totalSeconds = (this.endTime - this.startTime) / 1000
-      const secondsPerPixel = totalSeconds / this.canvasWidth
+      const secondsPerPixel = totalSeconds / 800
 
-      for (let x = 0; x <= this.canvasWidth; x += 50) {
+      for (let x = 0; x <= 800; x += 50) {
         const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000)
         const timeLabel = timeAtMarker.toTimeString().split(' ')[0].substring(0, 5)
 
         ctx.beginPath()
-        ctx.moveTo(x, this.canvasHeight - 20)
-        ctx.lineTo(x, this.canvasHeight)
+        ctx.moveTo(x, 80)
+        ctx.lineTo(x, 100)
         ctx.stroke()
 
         ctx.fillStyle = '#000'
         ctx.font = '10px Arial'
-        ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25)
+        ctx.fillText(timeLabel, x + 2, 75)
       }
 
       this.eventMarkers.forEach((event) => {
-        const eventStartPosition =
-          (event.start - this.startTime) / 1000 / secondsPerPixel
-        const eventEndPosition =
-          (event.end - this.startTime) / 1000 / secondsPerPixel
+        const eventStartPosition = (event.start - this.startTime) / 1000 / secondsPerPixel
+        const eventEndPosition = (event.end - this.startTime) / 1000 / secondsPerPixel
 
         ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
-        ctx.fillRect(
-          eventStartPosition,
-          0,
-          eventEndPosition - eventStartPosition,
-          this.canvasHeight
-        )
+        ctx.fillRect(eventStartPosition, 0, eventEndPosition - eventStartPosition, 100)
       })
 
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.moveTo(this.currentMarkerPosition, 0)
-      ctx.lineTo(this.currentMarkerPosition, this.canvasHeight)
+      ctx.lineTo(this.currentMarkerPosition, 100)
       ctx.stroke()
     }
   },
@@ -186,6 +176,12 @@ export default {
 </script>
 
 <style scoped>
+.timeline-container {
+  width: 800px;
+  margin: auto;
+  position: relative;
+}
+
 #scrubleft,
 #scrubright,
 #scruboutput {
@@ -193,15 +189,25 @@ export default {
   display: inline-flex;
   font-size: 12px;
   color: #333;
+  bottom: 5px;
+}
+
+#scrubleft {
+  left: 5px;
+}
+
+#scrubright {
+  right: 5px;
 }
 
 #scruboutput {
   color: blue;
-  bottom: 5px;
+  top: 5px;
 }
 
 canvas {
   display: block;
   cursor: pointer;
+  border: 1px solid #ccc;
 }
 </style>
