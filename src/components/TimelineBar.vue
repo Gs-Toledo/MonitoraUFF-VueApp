@@ -8,10 +8,11 @@
     ></v-text-field>
   </div>
 
-  <div id="timelinediv" class="w-full overflow-x-auto" v-show="events.length > 0">
+  <div id="timelinediv" class="relative w-full overflow-x-auto" v-show="events.length > 0">
     <canvas
       id="timeline"
       ref="timelineCanvas"
+      class="w-full"
       :width="canvasWidth"
       :height="canvasHeight"
       @mousedown="startDragging"
@@ -19,9 +20,7 @@
       @mouseup="stopDragging"
       @mouseleave="stopDragging"
     ></canvas>
-    <span id="scrubleft" :style="{ left: '5px' }">
-      {{ formatToBrazilDate(startTime) }}
-    </span>
+    <span id="scrubleft">{{ formatToBrazilDate(startTime) }}</span>
     <span id="scrubright" :style="{ left: canvasWidth - 160 + 'px' }">
       {{ formatToBrazilDate(endTime) }}
     </span>
@@ -45,7 +44,7 @@ export default {
   },
   data() {
     return {
-      canvasWidth: 896,
+      canvasWidth: window.innerWidth * 0.9,
       canvasHeight: 94,
       dragging: false,
       scrubOutputPosition: 275,
@@ -54,31 +53,18 @@ export default {
       endTime: null,
       selectedTime: null,
       currentMarkerPosition: 0,
-      eventMarkers: [],
-      filtered: false // Flag para controlar quando os eventos devem ser desenhados
+      eventMarkers: []
     }
   },
   watch: {
     events: {
-      immediate: false,
-      handler(newEvents) {
-        if (this.filtered && newEvents.length > 0) {
-          this.processEvents()
-        }
+      immediate: true,
+      handler() {
+        this.processEvents()
       }
     }
   },
   methods: {
-    formatTime(date) {
-      return date.toISOString().replace('T', ' ').split('.')[0]
-    },
-    stopDragging() {
-      this.dragging = false
-    },
-    startDragging(event) {
-      this.dragging = true
-      this.updateScrubOutput(event)
-    },
     formatToBrazilDate,
     updateDate(newDate) {
       if (!newDate) return
@@ -96,11 +82,6 @@ export default {
 
       this.processEvents()
     },
-    applyFilter() {
-      this.filtered = true
-      this.processEvents()
-    },
-
     processEvents() {
       this.eventMarkers = this.events
         .filter((event) => isSameDay(parseISO(event.Event.StartDateTime), this.startTime))
@@ -111,23 +92,29 @@ export default {
 
       this.drawTimeline()
     },
+    startDragging(event) {
+      this.dragging = true
+      this.updateScrubOutput(event)
+    },
+    drag(event) {
+      if (this.dragging) {
+        this.updateScrubOutput(event)
+      }
+    },
+    stopDragging() {
+      this.dragging = false
+    },
     updateScrubOutput(event) {
       const rect = this.$refs.timelineCanvas.getBoundingClientRect()
-      const x = event.clientX - rect.left
+      const x = Math.max(0, Math.min(event.clientX - rect.left, this.canvasWidth))
 
       const totalSeconds = (this.endTime - this.startTime) / 1000
       const secondsPerPixel = totalSeconds / this.canvasWidth
-
-      // calcula o tempo selecionado
       const selectedSeconds = x * secondsPerPixel
       this.selectedTime = addSeconds(this.startTime, selectedSeconds)
 
-      // evita ultrapassar os limites de 00:00 a 23:59
-      if (this.selectedTime < this.startTime) this.selectedTime = this.startTime
-      if (this.selectedTime > this.endTime) this.selectedTime = this.endTime
-
       this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
-      this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
+      this.currentMarkerPosition = x
 
       this.$emit('update-dates', {
         startDate: this.startTime,
@@ -135,20 +122,13 @@ export default {
         selectedDate: this.selectedTime
       })
 
-      console.log('valores', {
-        startDate: this.startTime,
-        endDate: this.endTime,
-        selectedDate: this.selectedTime
-      })
       this.drawTimeline()
     },
-
     drawTimeline() {
       const canvas = this.$refs.timelineCanvas
       if (!canvas) return
 
       const ctx = canvas.getContext('2d')
-
       ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       ctx.fillStyle = '#eaeaea'
       ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
@@ -156,12 +136,12 @@ export default {
       ctx.strokeStyle = '#555'
       ctx.lineWidth = 1
 
-      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
+      const totalSeconds = (this.endTime - this.startTime) / 1000
       const secondsPerPixel = totalSeconds / this.canvasWidth
 
       for (let x = 0; x <= this.canvasWidth; x += 50) {
         const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000)
-        const timeLabel = this.formatTime(timeAtMarker).split(' ')[1]
+        const timeLabel = timeAtMarker.toTimeString().split(' ')[0].substring(0, 5)
 
         ctx.beginPath()
         ctx.moveTo(x, this.canvasHeight - 20)
@@ -175,9 +155,9 @@ export default {
 
       this.eventMarkers.forEach((event) => {
         const eventStartPosition =
-          (event.start.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
+          (event.start - this.startTime) / 1000 / secondsPerPixel
         const eventEndPosition =
-          (event.end.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
+          (event.end - this.startTime) / 1000 / secondsPerPixel
 
         ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
         ctx.fillRect(
@@ -204,20 +184,8 @@ export default {
   }
 }
 </script>
+
 <style scoped>
-.timeline-container {
-  position: relative;
-  width: 896px;
-  height: 94px;
-  background: #f4f4f4;
-  border: 1px solid #ddd;
-}
-
-#scrubleft,
-#scrubright {
-  top: 9px;
-}
-
 #scrubleft,
 #scrubright,
 #scruboutput {

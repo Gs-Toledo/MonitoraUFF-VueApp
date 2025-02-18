@@ -135,6 +135,7 @@ export default {
         this.loading = true
         const zoneminderService = new ZoneminderService()
         this.events = []
+        this.filteredEvents = []
 
         for (let monitorId of this.selectedMonitors) {
           const responseData = await zoneminderService.getEventsByMonitorId(
