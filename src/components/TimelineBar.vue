@@ -33,7 +33,7 @@
 
 <script>
 import { formatToBrazilDate } from '@/utils/formatUtils'
-import { parseISO, startOfDay, endOfDay, isSameDay } from 'date-fns'
+import { parseISO, startOfDay, endOfDay, isSameDay, addSeconds } from 'date-fns'
 
 export default {
   emits: ['update-dates'],
@@ -55,7 +55,7 @@ export default {
       selectedTime: null,
       currentMarkerPosition: 0,
       eventMarkers: [],
-      filtered: false, // Flag para controlar quando os eventos devem ser desenhados
+      filtered: false // Flag para controlar quando os eventos devem ser desenhados
     }
   },
   watch: {
@@ -63,7 +63,7 @@ export default {
       immediate: false,
       handler(newEvents) {
         if (this.filtered && newEvents.length > 0) {
-          this.processEvents();
+          this.processEvents()
         }
       }
     }
@@ -72,91 +72,135 @@ export default {
     formatTime(date) {
       return date.toISOString().replace('T', ' ').split('.')[0]
     },
+    stopDragging() {
+      this.dragging = false
+    },
+    startDragging(event) {
+      this.dragging = true
+      this.updateScrubOutput(event)
+    },
     formatToBrazilDate,
-
     updateDate(newDate) {
       if (!newDate) return
 
       const baseDate = parseISO(newDate)
       this.startTime = startOfDay(baseDate)
       this.endTime = endOfDay(baseDate)
-      this.selectedTime = this.startTime 
+      this.selectedTime = this.startTime
 
       this.$emit('update-dates', {
         startDate: this.startTime,
         endDate: this.endTime,
         selectedDate: this.selectedTime
       })
-    },
 
+      this.processEvents()
+    },
     applyFilter() {
-      this.filtered = true;
-      this.processEvents();
+      this.filtered = true
+      this.processEvents()
     },
 
     processEvents() {
       this.eventMarkers = this.events
-        .filter(event => isSameDay(parseISO(event.Event.StartDateTime), this.startTime))
-        .map(event => ({
+        .filter((event) => isSameDay(parseISO(event.Event.StartDateTime), this.startTime))
+        .map((event) => ({
           start: parseISO(event.Event.StartDateTime),
           end: parseISO(event.Event.EndDateTime)
-        }));
+        }))
 
-      this.drawTimeline();
+      this.drawTimeline()
+    },
+    updateScrubOutput(event) {
+      const rect = this.$refs.timelineCanvas.getBoundingClientRect()
+      const x = event.clientX - rect.left
+
+      const totalSeconds = (this.endTime - this.startTime) / 1000
+      const secondsPerPixel = totalSeconds / this.canvasWidth
+
+      // calcula o tempo selecionado
+      const selectedSeconds = x * secondsPerPixel
+      this.selectedTime = addSeconds(this.startTime, selectedSeconds)
+
+      // evita ultrapassar os limites de 00:00 a 23:59
+      if (this.selectedTime < this.startTime) this.selectedTime = this.startTime
+      if (this.selectedTime > this.endTime) this.selectedTime = this.endTime
+
+      this.scrubOutputPosition = Math.max(5, Math.min(x - 50, this.canvasWidth - 160))
+      this.currentMarkerPosition = Math.max(0, Math.min(x, this.canvasWidth))
+
+      this.$emit('update-dates', {
+        startDate: this.startTime,
+        endDate: this.endTime,
+        selectedDate: this.selectedTime
+      })
+
+      console.log('valores', {
+        startDate: this.startTime,
+        endDate: this.endTime,
+        selectedDate: this.selectedTime
+      })
+      this.drawTimeline()
     },
 
     drawTimeline() {
-      const canvas = this.$refs.timelineCanvas;
-      if (!canvas) return;
+      const canvas = this.$refs.timelineCanvas
+      if (!canvas) return
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d')
 
-      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      ctx.fillStyle = '#eaeaea';
-      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+      ctx.fillStyle = '#eaeaea'
+      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-      ctx.strokeStyle = '#555';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#555'
+      ctx.lineWidth = 1
 
-      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000;
-      const secondsPerPixel = totalSeconds / this.canvasWidth;
+      const totalSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
+      const secondsPerPixel = totalSeconds / this.canvasWidth
 
       for (let x = 0; x <= this.canvasWidth; x += 50) {
-        const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000);
-        const timeLabel = this.formatTime(timeAtMarker).split(' ')[1];
+        const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000)
+        const timeLabel = this.formatTime(timeAtMarker).split(' ')[1]
 
-        ctx.beginPath();
-        ctx.moveTo(x, this.canvasHeight - 20);
-        ctx.lineTo(x, this.canvasHeight);
-        ctx.stroke();
+        ctx.beginPath()
+        ctx.moveTo(x, this.canvasHeight - 20)
+        ctx.lineTo(x, this.canvasHeight)
+        ctx.stroke()
 
-        ctx.fillStyle = '#000';
-        ctx.font = '10px Arial';
-        ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25);
+        ctx.fillStyle = '#000'
+        ctx.font = '10px Arial'
+        ctx.fillText(timeLabel, x + 2, this.canvasHeight - 25)
       }
 
-      this.eventMarkers.forEach(event => {
-        const eventStartPosition = (event.start.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel;
-        const eventEndPosition = (event.end.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel;
+      this.eventMarkers.forEach((event) => {
+        const eventStartPosition =
+          (event.start.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
+        const eventEndPosition =
+          (event.end.getTime() - this.startTime.getTime()) / 1000 / secondsPerPixel
 
-        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
-        ctx.fillRect(eventStartPosition, 0, eventEndPosition - eventStartPosition, this.canvasHeight);
-      });
+        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
+        ctx.fillRect(
+          eventStartPosition,
+          0,
+          eventEndPosition - eventStartPosition,
+          this.canvasHeight
+        )
+      })
 
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(this.currentMarkerPosition, 0);
-      ctx.lineTo(this.currentMarkerPosition, this.canvasHeight);
-      ctx.stroke();
-    },
+      ctx.strokeStyle = 'red'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(this.currentMarkerPosition, 0)
+      ctx.lineTo(this.currentMarkerPosition, this.canvasHeight)
+      ctx.stroke()
+    }
   },
   mounted() {
-    this.updateDate(this.selectedDate);
-  this.$nextTick(() => {
-    this.processEvents()
-    this.drawTimeline();
-  });
+    this.updateDate(this.selectedDate)
+    this.$nextTick(() => {
+      this.drawTimeline()
+    })
   }
 }
 </script>
