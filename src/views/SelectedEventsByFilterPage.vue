@@ -61,15 +61,15 @@
             </video>
           </div>
         </div>
-
-        <!-- Mensagem quando não há gravações -->
+<!-- 
+       
         <div
           v-else-if="filteredEvents.length == 0 && !loading && !isSendingRequest"
           class="w-full text-center py-8"
         >
           <p class="text-gray-600">{{ resultMsg }}</p>
         </div>
-
+ -->
         <v-alert v-if="error" type="error" class="mt-4">
           {{ error }}
         </v-alert>
@@ -100,7 +100,6 @@ export default {
       selectedMonitors: [],
       events: [],
       filteredEvents: [],
-      resultMsg: null,
       isSendingRequest: false,
       error: '',
       loading: true
@@ -168,10 +167,6 @@ export default {
           if (closestEvent) {
             this.filteredEvents.push(closestEvent)
           }
-        }
-
-        if (this.filteredEvents.length == 0) {
-          this.resultMsg = 'Nenhuma Gravação Encontrada'
         }
       } catch (error) {
         this.error = 'Erro ao carregar stream da câmera.'
