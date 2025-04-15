@@ -12,6 +12,13 @@ export default {
         'lg': '1024px',
         'xl': '1280px',
       },
+      colors: {
+        customBlueStart: '#215CAA',
+        customBlueEnd: '#0F315C',
+      },
+      backgroundImage: {
+        'blue-gradient': 'linear-gradient(to right, #215CAA, #0F315C)',
+      }
     },
   },
   plugins: [],

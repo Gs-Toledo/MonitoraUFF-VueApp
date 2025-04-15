@@ -3,7 +3,9 @@ import {  RouterView } from 'vue-router'
 </script>
 
 <template>
-  <RouterView />
+  <div class="min-h-screen w-full bg-blue-gradient" >
+    <router-view />
+  </div>
 </template>
 
 <!-- 

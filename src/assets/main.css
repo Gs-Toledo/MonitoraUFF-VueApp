@@ -19,3 +19,8 @@
   text-decoration: underline;
 }
 
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+
