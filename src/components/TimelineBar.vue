@@ -132,46 +132,64 @@ export default {
       this.drawTimeline()
     },
 
-    drawTimeline() {
-      const canvas = this.$refs.timelineCanvas
-      if (!canvas || !this.startTime || !this.endTime) return
+drawTimeline() {
+  const canvas = this.$refs.timelineCanvas;
+  if (!canvas || !this.startTime || !this.endTime) return;
 
-      const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, 800, 100)
-      ctx.fillStyle = '#eaeaea'
-      ctx.fillRect(0, 0, 800, 100)
-      ctx.strokeStyle = '#555'
-      ctx.lineWidth = 1
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
 
-      const totalSeconds = (this.endTime - this.startTime) / 1000
-      const secondsPerPixel = totalSeconds / 800
+  ctx.clearRect(0, 0, width, height);
 
-      for (let x = 0; x <= 800; x += 50) {
-        const timeAtMarker = new Date(this.startTime.getTime() + x * secondsPerPixel * 1000)
-        const timeLabel = timeAtMarker.toTimeString().split(' ')[0].substring(0, 5)
-        ctx.beginPath()
-        ctx.moveTo(x, 80)
-        ctx.lineTo(x, 100)
-        ctx.stroke()
-        ctx.fillStyle = '#000'
-        ctx.font = '10px Arial'
-        ctx.fillText(timeLabel, x + 2, 75)
-      }
+  // Fundo
+  ctx.fillStyle = '#f5f5f5';
+  ctx.fillRect(0, 0, width, height);
 
-      this.eventMarkers.forEach((event) => {
-        const eventStartPosition = (event.start - this.startTime) / 1000 / secondsPerPixel
-        const eventEndPosition = (event.end - this.startTime) / 1000 / secondsPerPixel
-        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
-        ctx.fillRect(eventStartPosition, 0, eventEndPosition - eventStartPosition, 100)
-      })
+  const totalSeconds = (this.endTime - this.startTime) / 1000;
+  const secondsPerPixel = totalSeconds / width;
 
-      ctx.strokeStyle = 'red'
-      ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.moveTo(this.currentMarkerPosition, 0)
-      ctx.lineTo(this.currentMarkerPosition, 100)
-      ctx.stroke()
-    }
+  // Marcas de hora reais, iterando por tempo, não por pixel
+  const timeStep = 60 * 60 * 1000; // 1 hora em ms
+  const firstHour = new Date(this.startTime);
+  firstHour.setMinutes(0, 0, 0); // arredonda para a hora cheia
+
+  for (let t = firstHour.getTime(); t <= this.endTime.getTime(); t += timeStep) {
+    const x = ((t - this.startTime.getTime()) / 1000) / secondsPerPixel;
+
+    // Linha da hora
+    ctx.beginPath();
+    ctx.moveTo(x, 65);
+    ctx.lineTo(x, height);
+    ctx.strokeStyle = '#aaa';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Texto da hora
+    const hourLabel = new Date(t).toTimeString().substring(0, 5);
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    ctx.fillText(hourLabel, x + 2, 60);
+  }
+
+  // Faixas de eventos
+  this.eventMarkers.forEach((event) => {
+    const startX = (event.start - this.startTime) / 1000 / secondsPerPixel;
+    const endX = (event.end - this.startTime) / 1000 / secondsPerPixel;
+
+    ctx.fillStyle = 'rgba(0, 180, 255, 0.5)';
+    ctx.fillRect(startX, 0, endX - startX, height);
+  });
+
+  // Linha central vermelha (marcador atual)
+  ctx.beginPath();
+  ctx.moveTo(this.currentMarkerPosition, 0);
+  ctx.lineTo(this.currentMarkerPosition, height);
+  ctx.strokeStyle = 'red';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
   },
 
   mounted() {
@@ -188,6 +206,17 @@ export default {
   width: 800px;
   margin: auto;
   position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+canvas {
+  display: block;
+  cursor: pointer;
+  border-radius: 20px;
+  background-color: #f5f5f5;
 }
 
 #scrubleft,
@@ -211,11 +240,5 @@ export default {
 #scruboutput {
   color: blue;
   top: 5px;
-}
-
-canvas {
-  display: block;
-  cursor: pointer;
-  border: 1px solid #ccc;
 }
 </style>
