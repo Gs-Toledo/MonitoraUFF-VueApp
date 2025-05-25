@@ -6,21 +6,25 @@
 
 .no-select {
   user-select: none;
-  -webkit-user-select: none; /* Para navegadores WebKit */
-  -moz-user-select: none; /* Para Firefox */
-  -ms-user-select: none; /* Para Internet Explorer/Edge */
+  -webkit-user-select: none;
+  /* Para navegadores WebKit */
+  -moz-user-select: none;
+  /* Para Firefox */
+  -ms-user-select: none;
+  /* Para Internet Explorer/Edge */
 }
 
-.monitor-anchor {
-  color: #486491;
-}
+/* .monitor-anchor {
+ 
+} */
 
 .monitor-anchor:hover {
   text-decoration: underline;
 }
 
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   margin: 0;
 }
-
