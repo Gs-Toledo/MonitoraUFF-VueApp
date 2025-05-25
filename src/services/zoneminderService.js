@@ -169,6 +169,14 @@ export default class ZoneminderService {
             // Função para formatar data no padrão desejado
             const formatDate = (date) => {
                 if (!date) return null;
+
+                const d = new Date(date); // Garante que seja um objeto Date
+                if (isNaN(d)) {
+                    console.error('Data inválida:', date);
+                    return null;
+                }
+
+
                 const pad = (num) => num.toString().padStart(2, '0');
                 const year = date.getFullYear();
                 const month = pad(date.getMonth() + 1);
@@ -186,7 +194,7 @@ export default class ZoneminderService {
                 url += `/StartTime >=:${formattedStartDate}`;
             }
 
-            
+
             if (params.endDate) {
                 /* const formattedEndDate = formatDate(params.endDate).replace(' ', '%20'); */
                 const formattedEndDate = formatDate(params.endDate)

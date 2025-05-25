@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <v-card class="mt-4" id="lista-eventos">
+      <v-card class="mt-4 !bg-[#215CAA]" id="lista-eventos">
         <v-card-title>Histórico de Gravações</v-card-title>
         <v-list two-line v-if="events.length > 0">
           <v-list-item
