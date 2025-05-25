@@ -1,11 +1,12 @@
 <template>
-  <v-navigation-drawer v-model="value" app class="bg-gray-100" permanent clipped>
+  <v-navigation-drawer v-model="value" app class=" !bg-[#1A375B]" permanent clipped>
     <v-list>
       <v-list-item
         v-for="(item, index) in navigationItems"
         :key="index"
         @click="navigateTo(item.route)"
-        class="hover:bg-gray-200"
+        
+        
       >
         <v-icon :icon="item.icon"></v-icon>
 

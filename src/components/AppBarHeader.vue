@@ -1,12 +1,12 @@
 <template>
-  <v-app-bar :elevation="2" class="bg-white shadow-md">
+  <v-app-bar :elevation="2" class="!bg-[#1A375B] shadow-md">
     <template v-slot:prepend>
       <v-app-bar-nav-icon>
         <v-icon icon="mdi-menu" @click="toggleDrawer"></v-icon>
       </v-app-bar-nav-icon>
     </template>
     <v-app-bar-title>
-      <router-link to="/home" class="text-gray-800">Monitora Uff</router-link>
+      <router-link to="/home" class="">Monitora Uff</router-link>
     </v-app-bar-title>
     <template v-slot:append>
       <v-btn icon="mdi-dots-vertical"></v-btn>
