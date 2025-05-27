@@ -1,0 +1,9 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(to right, #215CAA, #0F315C);
+
+    height: 100%;
+    overflow-x: hidden;
+}

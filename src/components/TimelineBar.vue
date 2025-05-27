@@ -25,9 +25,9 @@
     </span>
   </div>
 
-  <div class="text-gray-600" v-if="events.length == 0">
+  <div class="text-gray-400" v-if="events.length == 0">
     <div class="w-full text-center py-8">
-      <p class="text-gray-600">Nenhuma Gravação Disponível.</p>
+      <p class="">Nenhuma Gravação Disponível.</p>
     </div>
   </div>
 </template>

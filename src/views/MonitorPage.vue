@@ -66,7 +66,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <div v-else>Nenhuma Gravação Encontrada...</div>
+        <p class="ps-4" v-else>Nenhuma Gravação Encontrada...</p>
 
         <v-pagination
           v-model="currentPage"
