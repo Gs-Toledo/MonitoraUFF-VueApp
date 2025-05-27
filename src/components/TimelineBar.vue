@@ -3,6 +3,7 @@
     <v-text-field
       label="Data Início"
       v-model="selectedDate"
+      bg-color="white"
       type="date"
       @change="updateDate(selectedDate)"
     ></v-text-field>

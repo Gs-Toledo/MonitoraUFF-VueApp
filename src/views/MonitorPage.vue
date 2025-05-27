@@ -2,7 +2,7 @@
   <base-user-authenticated>
     <div v-if="isLoading">Carregando...</div>
     <div v-if="!isLoading" class="flex flex-column gap-4">
-      <div class="monitor-div">
+      <div class="monitor-div items-center flex flex-column">
         <h4 class="text-center">
           {{ monitor.Monitor.Name }}
         </h4>
@@ -11,7 +11,7 @@
           height="600"
           :src="generateStreamUrl(id)"
           alt="Monitor Stream"
-          class="monitor"
+          class="monitor  "
         />
       </div>
 
@@ -24,10 +24,11 @@
  -->
 
       <div class="filter-section mb-4">
-        <div class="flex">
+        <div class="flex gap-1">
           <v-text-field
             label="Data de Início"
             v-model="filter.startDate"
+            bg-color="white"
             type="datetime-local"            
             outlined
             dense
@@ -35,6 +36,7 @@
 
           <v-text-field
             label="Data de Fim"
+            bg-color="white"
             v-model="filter.endDate"
             type="datetime-local"
             outlined

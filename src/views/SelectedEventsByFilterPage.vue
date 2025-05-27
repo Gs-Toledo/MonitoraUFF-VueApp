@@ -21,6 +21,7 @@
             :items="monitors"
             item-value="id"
             item-title="name"
+            bg-color="white"
             label="Selecione as Câmeras"
             multiple
             outlined
