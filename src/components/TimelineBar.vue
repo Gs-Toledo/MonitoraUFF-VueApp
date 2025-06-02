@@ -45,7 +45,7 @@ export default {
     return {
       dragging: false,
       scrubOutputPosition: 275,
-      selectedDate: '2024-12-09',
+      selectedDate: '2025-06-01',
       startTime: null,
       endTime: null,
       selectedTime: null,

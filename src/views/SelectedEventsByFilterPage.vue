@@ -2,11 +2,7 @@
   <base-user-authenticated>
     <div class="h-full w-full">
       <!-- Barra de timeline -->
-      <timeline-bar
-        @update-dates="updateFilterDate"
-        :events="events"
-       
-      />
+      <timeline-bar @update-dates="updateFilterDate" :events="events" />
 
       <div class="flex flex-col p-4 space-y-4">
         <!-- Skeleton Loader para o select -->
@@ -40,11 +36,16 @@
         </div>
 
         <!-- Exibição das Câmeras selecionadas -->
+        <h3
+          v-if="filteredEvents.length > 0 && !loading && !isSendingRequest"
+          class="text-xl font-bold"
+        >
+          Gravações Filtradas:
+        </h3>
         <div
           v-if="filteredEvents.length > 0 && !loading && !isSendingRequest"
-          class="w-full space-y-4"
+          class="w-full d-flex "
         >
-          <h3 class="text-xl font-bold">Gravações Filtradas:</h3>
           <div
             v-for="evento in filteredEvents"
             :key="evento.id"
@@ -62,7 +63,7 @@
             </video>
           </div>
         </div>
-<!-- 
+        <!-- 
        
         <div
           v-else-if="filteredEvents.length == 0 && !loading && !isSendingRequest"
