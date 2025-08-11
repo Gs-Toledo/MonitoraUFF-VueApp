@@ -44,7 +44,7 @@
         </h3>
         <div
           v-if="filteredEvents.length > 0 && !loading && !isSendingRequest"
-          class="w-full d-flex "
+          class="w-full d-flex"
         >
           <div
             v-for="evento in filteredEvents"
@@ -72,13 +72,14 @@
           <p class="text-gray-600">{{ resultMsg }}</p>
         </div>
  -->
-        <v-alert v-if="error" type="error" class="mt-4">
-          {{ error }}
+        <v-alert v-if="errorMsg" type="error" class="mt-4">
+          {{ errorMsg }}
         </v-alert>
       </div>
     </div>
   </base-user-authenticated>
 </template>
+
 <script>
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
 import TimelineBar from '@/components/TimelineBar.vue'
@@ -103,7 +104,7 @@ export default {
       events: [],
       filteredEvents: [],
       isSendingRequest: false,
-      error: '',
+      errorMsg: '',
       loading: true
     }
   },
@@ -119,7 +120,8 @@ export default {
           name: monitor.Monitor.Name
         }))
       } catch (error) {
-        this.error = 'Erro ao carregar stream do monitor.'
+        this.errorMsg = 'Erro ao carregar stream do monitor.'
+        console.error(this.errorMsg, error)
       } finally {
         this.loading = false
       }
@@ -171,7 +173,8 @@ export default {
           }
         }
       } catch (error) {
-        this.error = 'Erro ao carregar stream da câmera.'
+        this.errorMsg = 'Erro ao carregar stream da câmera.'
+        console.error(this.errorMsg, error)
       } finally {
         this.loading = false
         this.isSendingRequest = false

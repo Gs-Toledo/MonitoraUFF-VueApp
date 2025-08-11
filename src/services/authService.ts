@@ -1,7 +1,9 @@
+import type { LoginData } from '@/@types/LoginData';
 import axios from 'axios';
+import type { Router } from 'vue-router';
 
 class AuthService {
-    static async login(loginData) {
+    static async login(loginData: LoginData) {
         try {
             const urlRequest = '/api/host/login.json'
             // API de Login só aceita URLSearchParams
@@ -21,7 +23,7 @@ class AuthService {
         }
     }
 
-    static async refreshToken(refreshToken) {
+    static async refreshToken(refreshToken: string) {
         try {
             const urlRefresh = '/api/host/login.json';
 
@@ -39,7 +41,7 @@ class AuthService {
         }
     }
 
-    static logout(router) {
+    static logout(router: Router) {
         router.push('/login');
         setTimeout(() => {
             localStorage.removeItem('acess_token');

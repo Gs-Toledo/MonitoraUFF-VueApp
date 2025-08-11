@@ -171,7 +171,7 @@ export default class ZoneminderService {
                 if (!date) return null;
 
                 const d = new Date(date); // Garante que seja um objeto Date
-                if (isNaN(d)) {
+                if (!(d instanceof Date) || isNaN(d.getTime())) {
                     console.error('Data inválida:', date);
                     return null;
                 }

@@ -13,12 +13,10 @@
   </v-app>
 </template>
 
-<script>
-import AppBarHeader from '@/components/AppBarHeader.vue'
+<script setup lang="ts">
+import { defineAsyncComponent } from 'vue';
 
-export default {
-  components: {
-    AppBarHeader
-  }
-}
+const AppBarHeader = defineAsyncComponent({
+  loader: () => import('@/components/AppBarHeader.vue')
+})
 </script>

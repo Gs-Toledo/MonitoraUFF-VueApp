@@ -23,33 +23,35 @@
   <sidebar-user v-model="drawer" />
 </template>
 
-<script>
-import ModalLogout from './ModalLogout.vue'
-import SidebarUser from './SidebarUser.vue'
-import router from '@/router'
-import { mapActions } from 'vuex'
+<script setup lang="ts">
+import { defineAsyncComponent, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
-export default {
-  components: { ModalLogout, SidebarUser },
-  data() {
-    return {
-      drawer: false,
-      showLogoutModal: false
-    }
-  },
-  methods: {
-    ...mapActions(['logout']),
-    openLogoutModal() {
-      this.showLogoutModal = true
-    },
-    toggleDrawer() {
-      this.drawer = !this.drawer
-    },
-    handleLogout() {
-      console.log('Deslogando usuário...')
-      this.logout(router)
-      this.showLogoutModal = false
-    }
-  }
+const ModalLogout = defineAsyncComponent({
+  loader: () => import('./ModalLogout.vue'),
+  timeout: 10000
+})
+
+const SidebarUser = defineAsyncComponent({
+  loader: () => import('./SidebarUser.vue')
+})
+
+const drawer = ref(false)
+const showLogoutModal = ref(false)
+
+const store = useStore()
+const router = useRouter()
+
+function openLogoutModal() {
+  showLogoutModal.value = true
+}
+function toggleDrawer() {
+  drawer.value = !drawer.value
+}
+function handleLogout() {
+  console.log('Deslogando usuário...')
+  store.dispatch('logout', router)
+  showLogoutModal.value = false
 }
 </script>

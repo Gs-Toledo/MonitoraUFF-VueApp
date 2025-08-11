@@ -1,23 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import LoginPage from '@/views/LoginPage.vue'
 import HomePage from '@/views/HomePage.vue'
-import store from '@/store/index';
-import MonitorPage from '@/views/MonitorPage.vue';
-import EventMonitorPage from '@/views/EventMonitorPage.vue';
-import AllMonitorsPage from '@/views/AllMonitorsPage.vue';
-import SelectedEventsByFilterPage from '@/views/SelectedEventsByFilterPage.vue';
+import store from '@/store/index'
+import MonitorPage from '@/views/MonitorPage.vue'
+import EventMonitorPage from '@/views/EventMonitorPage.vue'
+import AllMonitorsPage from '@/views/AllMonitorsPage.vue'
+import SelectedEventsByFilterPage from '@/views/SelectedEventsByFilterPage.vue'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Root',
-    beforeEnter: (to, from, next) => {
-      if (store.getters.isAuthenticated) {
-        next('/home');
-      } else {
-        next('/login');
-      }
-    }
+    redirect: () => (store.getters.isAuthenticated ? '/home' : '/login')
   },
   {
     path: '/login',
@@ -47,7 +41,7 @@ const routes = [
     props: true,
     name: 'Monitor',
     component: MonitorPage,
-    meta: {requiresAuth: true},
+    meta: { requiresAuth: true }
   },
   {
     path: '/cameras/:id/gravacao/:eventId',
@@ -56,20 +50,20 @@ const routes = [
     component: EventMonitorPage,
     meta: { requiresAuth: true }
   }
-];
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
-});
+})
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.getters.isAuthenticated;
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/');
+  const isAuthenticated = store.getters.isAuthenticated
+  if (to.matched.some((record) => record.meta.requiresAuth) && !isAuthenticated) {
+    next('/')
   } else {
-    next();
+    next()
   }
-});
+})
 
-export default router;
+export default router

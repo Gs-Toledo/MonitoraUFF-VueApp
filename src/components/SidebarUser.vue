@@ -16,39 +16,39 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-export default {
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true
-    }
-  },
-  emits: ['update:modelValue'],
-  computed: {
-    value: {
-      get() {
-        return this.modelValue
-      },
-      set(val) {
-        this.$emit('update:modelValue', val)
-      }
-    }
-  },
-  data() {
-    return {
-      navigationItems: [
-        { title: 'Home', icon: 'mdi-home', route: '/home' },
-        { title: 'Câmeras', icon: 'mdi-monitor', route: '/cameras' },
-        { title: 'Filtro de Gravações', icon: 'mdi-film', route: '/filtro-gravacoes' }
-      ]
-    }
-  },
-  methods: {
-    navigateTo(route) {
-      this.$router.push(route)
-      this.$emit('update:modelValue', false)
-    }
-  }
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+interface NavigationItem {
+  title: string;
+  icon: string;
+  route: string;
 }
+
+const props = defineProps<{
+  modelValue: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void;
+}>();
+
+const router = useRouter();
+
+const value = computed<boolean>({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
+});
+
+const navigationItems = ref<NavigationItem[]>([
+  { title: 'Home', icon: 'mdi-home', route: '/home' },
+  { title: 'Câmeras', icon: 'mdi-monitor', route: '/cameras' },
+  { title: 'Filtro de Gravações', icon: 'mdi-film', route: '/filtro-gravacoes' }
+]);
+
+const navigateTo = (route: string) => {
+  router.push(route);
+  emit('update:modelValue', false);
+};
 </script>

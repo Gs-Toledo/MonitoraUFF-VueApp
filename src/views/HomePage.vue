@@ -4,12 +4,6 @@
   </base-user-authenticated>
 </template>
 
-<script>
+<script setup lang="ts">
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
-
-export default {
-  components: {
-    BaseUserAuthenticated
-  }
-}
 </script>

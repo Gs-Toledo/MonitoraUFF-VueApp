@@ -14,7 +14,7 @@
           density="compact"
           placeholder="Insira o Login"
           prepend-inner-icon="mdi-email-outline"
-          v-model="username"
+          v-model="loginData.user"
           variant="outlined"
           theme="dark"
         ></v-text-field>
@@ -34,7 +34,7 @@
           prepend-inner-icon="mdi-lock-outline"
           variant="outlined"
           @click:append-inner="isPasswordVisible = !isPasswordVisible"
-          v-model="password"
+          v-model="loginData.pass"
           theme="dark"
         ></v-text-field>
 
@@ -65,35 +65,31 @@
     </v-card>
   </div>
 </template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import type { LoginData } from '@/@types/LoginData'
 
-<script>
-import { mapActions } from 'vuex'
+const loginData = ref<LoginData>({ user: '', pass: '' })
+const errorMessage = ref('')
+const isSendingRequest = ref(false)
+const isPasswordVisible = ref(false)
 
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      errorMessage: '',
-      isSendingRequest: false,
-      isPasswordVisible: false
-    }
-  },
-  methods: {
-    ...mapActions(['login']),
-    async executeLogin() {
-      this.isSendingRequest = true
-      try {
-        const loginData = { user: this.username, pass: this.password }
-        await this.login(loginData)
-        this.$router.push('/home')
-      } catch (error) {
-        console.log(error)
-        this.errorMessage = 'Login falhou. Verifique suas credenciais.'
-      } finally {
-        this.isSendingRequest = false
-      }
-    }
+const store = useStore()
+const router = useRouter()
+
+const executeLogin = async () => {
+  isSendingRequest.value = true
+  try {
+    await store.dispatch('login', loginData.value)
+
+    router.push('/home')
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = 'Login falhou. Verifique suas credenciais.'
+  } finally {
+    isSendingRequest.value = false
   }
 }
 </script>

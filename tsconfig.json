@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "esModuleInterop": true,
+        "jsx": "preserve",
+        "allowJs": true,
+        "checkJs": true,
+        "strict": false, // desativado por enquanto
+        "types": [
+            "vite/client"
+        ]
+    },
+    "include": [
+        "src/**/*"
+, "public/register-worker.js", "public/service-worker.js"    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "extends": "@vue/tsconfig/tsconfig.json"
+}
