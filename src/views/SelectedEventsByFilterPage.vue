@@ -2,7 +2,7 @@
   <base-user-authenticated>
     <div class="h-full w-full">
       <!-- Barra de timeline -->
-      <timeline-bar @update-dates="updateFilterDate" :events="events" />
+      <TimelineBar @update-dates="updateFilterDate" :events="events" />
 
       <div class="flex flex-col p-4 space-y-4">
         <!-- Skeleton Loader para o select -->
@@ -33,6 +33,16 @@
           >
             Filtrar
           </v-btn>
+          <v-btn
+            v-if="events.length > 0"
+            block
+            class="mt-4"
+            color="green"
+            variant="tonal"
+            :disabled="isSendingRequest"
+            @click="downloadRecordings"
+            >Baixar Selecionados</v-btn
+          >
         </div>
 
         <!-- Exibição das Câmeras selecionadas -->
@@ -80,161 +90,176 @@
   </base-user-authenticated>
 </template>
 
-<script>
+<script setup lang="ts">
 import BaseUserAuthenticated from '@/components/BaseUserAuthenticated.vue'
-import TimelineBar from '@/components/TimelineBar.vue'
+import { MonitoraAPiService } from '@/services/MonitoraApiService'
 import ZoneminderService from '@/services/zoneminderService'
 import { generateEventVideoStreamUrl } from '@/utils/monitorUtils'
 import { isValid, parse, differenceInSeconds } from 'date-fns'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 
-export default {
-  components: {
-    BaseUserAuthenticated,
-    TimelineBar
-  },
-  data() {
-    return {
-      monitors: [],
-      filterDate: {
-        startDate: '',
-        endDate: '',
-        selectedDate: ''
-      },
-      selectedMonitors: [],
-      events: [],
-      filteredEvents: [],
-      isSendingRequest: false,
-      errorMsg: '',
-      loading: true
-    }
-  },
-  methods: {
-    async getAllMonitors() {
-      try {
-        this.error = ''
-        this.loading = true
-        const zoneminderService = new ZoneminderService()
-        const responseData = await zoneminderService.getMonitors()
-        this.monitors = responseData.map((monitor) => ({
-          id: monitor.Monitor.Id,
-          name: monitor.Monitor.Name
-        }))
-      } catch (error) {
-        this.errorMsg = 'Erro ao carregar stream do monitor.'
-        console.error(this.errorMsg, error)
-      } finally {
-        this.loading = false
-      }
-    },
-    async getEventsByMonitorId() {
-      if (this.selectedMonitors.length == 0) {
-        alert('Escolha ao menos uma camera')
-      } else if (this.filterDate.selectedDate == null) {
-        alert('Selecione uma data. ')
-      }
+interface TimelinefilterParams {
+  startDate: string
+  endDate: string
+  selectedDate: string
+}
 
-      try {
-        this.isSendingRequest = true
-        this.loading = true
-        const zoneminderService = new ZoneminderService()
-        this.events = []
-        this.filteredEvents = []
+const TimelineBar = defineAsyncComponent({
+  loader: () => import('@/components/TimelineBar.vue')
+})
 
-        for (let monitorId of this.selectedMonitors) {
-          const responseData = await zoneminderService.getEventsByMonitorId(
-            monitorId,
-            this.filterDate
-          )
+const monitors = ref<{ id: number; name: string }[]>([])
+const filterDate = ref({ startDate: '', endDate: '', selectedDate: '' })
+const selectedMonitors = ref<number[]>([])
+const events = ref([])
 
-          this.events = [...this.events, ...responseData.events]
+const filteredEvents = ref([])
+const isSendingRequest = ref(false)
+const errorMsg = ref('')
+const loading = ref(true)
 
-          const selectedTime = new Date(this.filterDate.selectedDate)
-          let closestEvent = null
-          let minTimeDiff = Infinity
-
-          responseData.events.forEach((evento) => {
-            const monitor = this.monitors.find((m) => m.id === monitorId)
-            evento.monitorName = monitor ? monitor.name : 'Camera Desconhecida'
-
-            const eventStart = new Date(evento.Event.StartDateTime)
-            const eventEnd = new Date(evento.Event.EndDateTime)
-
-            if (selectedTime >= eventStart && selectedTime <= eventEnd) {
-              const timeDiff = Math.abs(selectedTime - eventStart)
-              if (timeDiff < minTimeDiff) {
-                minTimeDiff = timeDiff
-                closestEvent = evento
-              }
-            }
-          })
-
-          if (closestEvent) {
-            this.filteredEvents.push(closestEvent)
-          }
-        }
-      } catch (error) {
-        this.errorMsg = 'Erro ao carregar stream da câmera.'
-        console.error(this.errorMsg, error)
-      } finally {
-        this.loading = false
-        this.isSendingRequest = false
-      }
-    },
-    updateFilterDate({ startDate, endDate, selectedDate }) {
-      this.filterDate = { startDate, endDate, selectedDate }
-    },
-    setVideoTime(evento, videoElement) {
-      if (!videoElement || !this.filterDate.startDate) return
-
-      let eventStart = evento.Event.StartDateTime
-      let eventEnd = evento.Event.EndDateTime
-      let selectedTime = this.filterDate.selectedDate
-
-      console.log('teste de datas', {
-        eventStart: evento.Event.StartDateTime,
-        eventEnd: evento.Event.EndDateTime,
-        selectedTime: this.filterDate.selectedDate
-      })
-
-      eventStart =
-        typeof eventStart === 'string'
-          ? parse(eventStart, 'yyyy-MM-dd HH:mm:ss', new Date())
-          : new Date(eventStart)
-      eventEnd =
-        typeof eventEnd === 'string'
-          ? parse(eventEnd, 'yyyy-MM-dd HH:mm:ss', new Date())
-          : new Date(eventEnd)
-      selectedTime = selectedTime instanceof Date ? selectedTime : new Date(selectedTime)
-
-      console.log('Datas convertidas:', { eventStart, eventEnd, selectedTime })
-
-      if (!isValid(eventStart) || !isValid(eventEnd) || !isValid(selectedTime)) {
-        console.error('Data inválida detectada!', { eventStart, eventEnd, selectedTime })
-        return
-      }
-
-      let newTime = 0
-
-      console.log('teste do if', selectedTime >= eventStart, selectedTime <= eventEnd)
-      if (selectedTime >= eventStart && selectedTime <= eventEnd) {
-        newTime = differenceInSeconds(selectedTime, eventStart)
-      } else if (selectedTime > eventEnd) {
-        newTime = differenceInSeconds(eventEnd, eventStart) // tempo max do evento
-      }
-
-      console.log(`Setando currentTime para: ${newTime} segundos`)
-
-      const handleCanPlay = () => {
-        videoElement.currentTime = newTime
-        videoElement.removeEventListener('canplay', handleCanPlay)
-      }
-
-      videoElement.addEventListener('canplay', handleCanPlay, { once: true })
-    },
-    generateEventVideoStreamUrl
-  },
-  async mounted() {
-    await this.getAllMonitors()
+async function getAllMonitors() {
+  try {
+    errorMsg.value = ''
+    loading.value = true
+    const zoneminderService = new ZoneminderService()
+    const responseData = await zoneminderService.getMonitors()
+    monitors.value = responseData.map((monitor) => ({
+      id: monitor.Monitor.Id,
+      name: monitor.Monitor.Name
+    }))
+  } catch (error) {
+    errorMsg.value = 'Erro ao carregar stream do monitor.'
+    console.error(errorMsg.value, error)
+  } finally {
+    loading.value = false
   }
 }
+
+async function getEventsByMonitorId() {
+  if (selectedMonitors.value.length == 0) {
+    alert('Escolha ao menos uma camera')
+  } else if (filterDate.value.selectedDate == null) {
+    alert('Selecione uma data. ')
+  }
+
+  try {
+    isSendingRequest.value = true
+    loading.value = true
+    const zoneminderService = new ZoneminderService()
+    events.value = []
+    filteredEvents.value = []
+
+    for (let monitorId of selectedMonitors.value) {
+      const responseData = await zoneminderService.getEventsByMonitorId(monitorId, filterDate.value)
+
+      events.value = [...events.value, ...responseData.events]
+
+      const selectedTime = new Date(filterDate.value.selectedDate)
+      let closestEvent = null
+      let minTimeDiff = Infinity
+
+      responseData.events.forEach((evento) => {
+        const monitor = monitors.value.find((m) => m.id === monitorId)
+        evento.monitorName = monitor ? monitor.name : 'Camera Desconhecida'
+
+        const eventStart = new Date(evento.Event.StartDateTime)
+        const eventEnd = new Date(evento.Event.EndDateTime)
+
+        if (selectedTime >= eventStart && selectedTime <= eventEnd) {
+          const timeDiff = Math.abs(selectedTime - eventStart)
+          if (timeDiff < minTimeDiff) {
+            minTimeDiff = timeDiff
+            closestEvent = evento
+          }
+        }
+      })
+
+      if (closestEvent) {
+        filteredEvents.value.push(closestEvent)
+      }
+    }
+  } catch (error) {
+    errorMsg.value = 'Erro ao carregar stream da câmera.'
+    console.error(errorMsg.value, error)
+  } finally {
+    loading.value = false
+    isSendingRequest.value = false
+  }
+}
+
+function updateFilterDate({ startDate, endDate, selectedDate }: TimelinefilterParams) {
+  filterDate.value = { startDate, endDate, selectedDate }
+}
+
+function setVideoTime(evento, videoElement) {
+  if (!videoElement || !filterDate.value.startDate) return
+
+  let eventStart = evento.Event.StartDateTime
+  let eventEnd = evento.Event.EndDateTime
+  let selectedTime = filterDate.value.selectedDate
+
+  console.log('teste de datas', {
+    eventStart: evento.Event.StartDateTime,
+    eventEnd: evento.Event.EndDateTime,
+    selectedTime: filterDate.value.selectedDate
+  })
+
+  eventStart =
+    typeof eventStart === 'string'
+      ? parse(eventStart, 'yyyy-MM-dd HH:mm:ss', new Date())
+      : new Date(eventStart)
+  eventEnd =
+    typeof eventEnd === 'string'
+      ? parse(eventEnd, 'yyyy-MM-dd HH:mm:ss', new Date())
+      : new Date(eventEnd)
+  selectedTime = selectedTime instanceof Date ? selectedTime : new Date(selectedTime)
+
+  console.log('Datas convertidas:', { eventStart, eventEnd, selectedTime })
+
+  if (!isValid(eventStart) || !isValid(eventEnd) || !isValid(selectedTime)) {
+    console.error('Data inválida detectada!', { eventStart, eventEnd, selectedTime })
+    return
+  }
+
+  let newTime = 0
+
+  console.log('teste do if', selectedTime >= eventStart, selectedTime <= eventEnd)
+  if (selectedTime >= eventStart && selectedTime <= eventEnd) {
+    newTime = differenceInSeconds(selectedTime, eventStart)
+  } else if (selectedTime > eventEnd) {
+    newTime = differenceInSeconds(eventEnd, eventStart) // tempo max do evento
+  }
+
+  console.log(`Setando currentTime para: ${newTime} segundos`)
+
+  const handleCanPlay = () => {
+    videoElement.currentTime = newTime
+    videoElement.removeEventListener('canplay', handleCanPlay)
+  }
+
+  videoElement.addEventListener('canplay', handleCanPlay, { once: true })
+}
+
+async function downloadRecordings() {
+  try {
+    isSendingRequest.value = true
+    const { startDate, endDate } = filterDate.value
+
+    const monitors = selectedMonitors.value.map((monitor) => {
+      return { zoneminderInstanceId: 1, cameraId: monitor }
+    })
+
+    await MonitoraAPiService.downloadGravações(monitors, startDate, endDate)
+  } catch (error) {
+    errorMsg.value = error
+    console.error('Erro no download de gravações:', error)
+  } finally {
+    isSendingRequest.value = false
+  }
+}
+
+onMounted(() => {
+  getAllMonitors()
+})
 </script>
