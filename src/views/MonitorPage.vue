@@ -91,7 +91,7 @@
                 >Ver Gravação</router-link
               >
             </p>
-            <v-btn color="primary" :href="downloadEvent(selectedEvent.Id)" target="_blank">
+            <v-btn color="primary" :href="downloadEvent(selectedEvent.Id)" download target="_blank">
               Download Gravação
             </v-btn>
           </v-card-text>

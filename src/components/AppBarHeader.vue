@@ -16,6 +16,8 @@
     <modal-logout
       :visible="showLogoutModal"
       @update:visible="showLogoutModal = $event"
+      title="Sair"
+      message="Tem certeza que deseja deslogar?"
       @confirm="handleLogout"
     />
   </v-app-bar>

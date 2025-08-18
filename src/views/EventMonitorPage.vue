@@ -14,7 +14,7 @@
         /> -->
 
         <video
-          autoplay=""
+          
           controls
           id="videoobj_html5_api"
           class="vjs-tech"

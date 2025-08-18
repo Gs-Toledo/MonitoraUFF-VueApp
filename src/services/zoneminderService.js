@@ -217,9 +217,10 @@ export default class ZoneminderService {
     downloadEvent(eventId) {
         let zoneminderBaseUrl = import.meta.env.VITE_API_URL_LOCALNETWORK
         try {
-            const url = `${zoneminderBaseUrl}/index.php?mode=mp4&view=view_video&eid=${eventId}&auth=${store.getters.getToken}`
+            const url = `${zoneminderBaseUrl}/index.php?mode=mp4&view=view_video&eid=${eventId}&token=${store.getters.getToken}`
 
             return url
+           
             /*       const response = await axios.get(url, {
                       responseType: 'blob'
                   })
