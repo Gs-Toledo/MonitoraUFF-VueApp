@@ -41,8 +41,10 @@
             variant="tonal"
             :disabled="isSendingRequest"
             @click="downloadRecordings"
-            >Baixar Selecionados</v-btn
           >
+            <template v-if="isSendingRequest">Baixando, por favor aguarde...</template>
+            <template v-else> Baixar Selecionados </template>
+          </v-btn>
         </div>
 
         <!-- Exibição das Câmeras selecionadas -->
